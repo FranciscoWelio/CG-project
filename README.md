@@ -59,10 +59,10 @@ Existem também variações do algoritmo do ponto médio que podem ser aplicadas
 
 ## Transformações 2D com Matrizes Homogêneas
 
-Na computação gráfica, utilizamos **coordenadas homogêneas** para representar as transformações geométricas de maneira unificada. As coordenadas homogêneas adicionam uma dimensão extra às coordenadas \(x\) e \(y\), utilizando a notação \([x, y, 1]\). Com isso, todas as transformações podem ser realizadas com multiplicações de matrizes.
+Nas transformações 2D, o uso de **matrizes homogêneas** facilita a composição de várias transformações em uma única operação. Para representar um ponto \([x, y]\), utilizamos a forma homogênea \([x, y, 1]\), o que permite que todas as transformações geométricas possam ser feitas através de multiplicações de matrizes.
 
 ### 1. **Translação**
-A translação desloca uma figura ao somar valores constantes às coordenadas \(x\) e \(y\). A matriz homogênea para a translação é:
+A translação move um objeto ao somar valores constantes \(t_x\) e \(t_y\) às coordenadas \(x\) e \(y\). A matriz homogênea para a translação é:
 
 \[
 T(t_x, t_y) =
@@ -73,7 +73,7 @@ T(t_x, t_y) =
 \end{bmatrix}
 \]
 
-Aplicando a translação a um ponto \([x, y, 1]\), temos:
+Multiplicando esta matriz por um ponto \([x, y, 1]\), obtemos o novo ponto transladado \([x', y', 1]\):
 
 \[
 \begin{bmatrix}
@@ -95,7 +95,7 @@ y + t_y \\
 \]
 
 ### 2. **Escala**
-A escala altera o tamanho de uma figura ao multiplicar as coordenadas \(x\) e \(y\) por fatores constantes \(s_x\) e \(s_y\). A matriz homogênea para a escala é:
+A escala altera o tamanho de um objeto, multiplicando suas coordenadas por um fator \(s_x\) e \(s_y\). A matriz homogênea para a escala é:
 
 \[
 S(s_x, s_y) =
@@ -106,7 +106,7 @@ s_x & 0 & 0 \\
 \end{bmatrix}
 \]
 
-Aplicando a escala a um ponto \([x, y, 1]\), temos:
+Multiplicando a matriz de escala por um ponto \([x, y, 1]\), obtemos o ponto escalado \([x', y', 1]\):
 
 \[
 \begin{bmatrix}
@@ -128,7 +128,7 @@ y \cdot s_y \\
 \]
 
 ### 3. **Rotação**
-A rotação gira uma figura em torno da origem de acordo com um ângulo \(\theta\). A matriz homogênea para a rotação é:
+A rotação gira um objeto em torno de um ponto, geralmente a origem, de acordo com um ângulo \(\theta\). A matriz homogênea para a rotação é:
 
 \[
 R(\theta) =
@@ -139,7 +139,7 @@ R(\theta) =
 \end{bmatrix}
 \]
 
-Aplicando a rotação a um ponto \([x, y, 1]\), temos:
+Multiplicando a matriz de rotação por um ponto \([x, y, 1]\), obtemos o novo ponto rotacionado \([x', y', 1]\):
 
 \[
 \begin{bmatrix}
@@ -161,7 +161,7 @@ x \sin(\theta) + y \cos(\theta) \\
 \]
 
 ### 4. **Reflexão**
-A reflexão inverte uma figura em relação a um eixo. Por exemplo, a matriz homogênea para refletir em torno do eixo \(x\) é:
+A reflexão inverte as coordenadas de um objeto em relação a um eixo. A matriz homogênea para refletir em torno do eixo \(x\) é:
 
 \[
 \text{Reflexão no eixo } x =
@@ -184,7 +184,7 @@ Para refletir em torno do eixo \(y\), a matriz é:
 \]
 
 ### 5. **Cisalhamento**
-O cisalhamento distorce uma figura, alterando as coordenadas em uma direção proporcional à outra. A matriz homogênea para o cisalhamento no eixo \(x\) é:
+O cisalhamento distorce um objeto, alterando suas coordenadas em uma direção proporcional à outra. A matriz homogênea para o cisalhamento no eixo \(x\) é:
 
 \[
 Sh_x(sh_x) =
@@ -208,4 +208,4 @@ sh_y & 1 & 0 \\
 
 ## Conclusão
 
-Este projeto abrange os principais algoritmos e transformações geométricas utilizados na computação gráfica. Com o uso de coordenadas homogêneas e multiplicação de matrizes, podemos unificar e simplificar a aplicação de transformações como translação, rotação,
+Este projeto abrange os principais algoritmos e transformações geométricas utilizados na computação gráfica. Com o uso de coordenadas homogêneas e multiplicação de matrizes, podemos unificar e simplificar a aplicação de transformações como translação, rotação, escala, reflexão e cisalhamento.
