@@ -5,7 +5,8 @@ import cv2
 import numpy as np
 from PIL import Image, ImageTk
 from .utils import (
-    PixelGridDisplay
+    PixelGridDisplay,
+    MaskEditor
 )
 
 
@@ -40,7 +41,7 @@ def apply_dilation(image: np.ndarray, kernel: np.ndarray, binary=False) -> np.nd
                 region = padded[i:i+k_height, j:j+k_width]
                 # For grayscale images
                 values = region + kernel
-                output[i, j] = np.max(values)
+                output[i, j] = np.max(values) + 1
                 
     return np.clip(output, 0, 255).astype(np.uint8)
 
@@ -82,7 +83,7 @@ def apply_erosion(image: np.ndarray, kernel: np.ndarray, binary = False) -> np.n
             for j in range(img_width):
                 region = padded[i:i+k_height, j:j+k_width]
                 values = region - kernel
-                output[i, j] = np.min(values)
+                output[i, j] = np.min(values) - 1
                 
     return np.clip(output, 0, 255).astype(np.uint8)
 
@@ -117,19 +118,25 @@ class MorphologicalProcessor:
         self.restore = restore
         self.original_image = None
         self.processed_image = None
+        self.mask_editor= None
         self.binary_threshold = 127
         self.scale_factor = 1.0
         window.title("Projeto Unidade 2 > Operações Morfológicas")
         window.geometry("750x630")
+        self.windows = window
 
         ttk.Button(window, text="Voltar", command=restore).pack(pady=5)
         
         # Controls
-        controls = ttk.Frame(window)
-        controls.pack(pady=10)
-        
+        self.controls = ttk.Frame(window)
+        self.controls.pack(pady=10)
+
+        # Frame para o botão de editar máscara (para manter o espaço consistente)
+        self.edit_mask_frame = ttk.Frame(self.controls)
+        self.edit_mask_frame.pack(side=tk.LEFT, padx=5)
+
         # Image loading and type selection
-        load_frame = ttk.Frame(controls)
+        load_frame = ttk.Frame(self.controls)
         load_frame.pack(side=tk.LEFT, padx=5)
         
         ttk.Button(load_frame, text="Carregar Imagem", command=self.load_image).pack(side=tk.LEFT, padx=5)
@@ -140,18 +147,23 @@ class MorphologicalProcessor:
         # Operation selection
         self.operation_var = tk.StringVar(value="Dilatação")
         operations = ["Dilatação", "Erosão", "Abertura", "Fechamento", "Contorno Interno", "Contorno Externo", "Gradiente", "Top-Hat", "Bottom-Hat"]
-        self.operation_combo = ttk.Combobox(controls, textvariable=self.operation_var, values=operations)
+        self.operation_combo = ttk.Combobox(self.controls, textvariable=self.operation_var, values=operations)
         self.operation_combo.pack(side=tk.LEFT, padx=5)
         
         # Element structure selection
         self.element_var = tk.StringVar(value="3x3")
-        elements = ["3x3", "Cruz", "Linha H", "Linha V"]
-        ttk.Label(controls, text="Elemento Estruturante:").pack(side=tk.LEFT)
-        self.element_combo = ttk.Combobox(controls, textvariable=self.element_var, values=elements, width=10)
+        elements = ["3x3", "Cruz", "Linha H", "Linha V", "Customizada"]
+        ttk.Label(self.controls, text="Elemento Estruturante:").pack(side=tk.LEFT)
+        self.element_combo = ttk.Combobox(self.controls, textvariable=self.element_var, values=elements, width=10)
         self.element_combo.pack(side=tk.LEFT, padx=5)
+        self.element_combo.bind('<<ComboboxSelected>>', self.update_edit_mask_button)
+
+        self.update_edit_mask_button(None)
         
-        ttk.Button(controls, text="Processar", command=self.process_image).pack(side=tk.LEFT, padx=5)
-        ttk.Button(controls, text="Salvar", command=self.save_image).pack(side=tk.LEFT, padx=5)
+        self.process_save_frame = ttk.Frame(self.controls)
+        self.process_save_frame.pack(side=tk.LEFT)
+        self.processar_button = ttk.Button(self.process_save_frame, text="Processar", command=self.process_image).pack(side=tk.LEFT, padx=5)
+        ttk.Button(self.process_save_frame, text="Salvar", command=self.save_image).pack(side=tk.LEFT, padx=5)
 
         # Scroll frame setup
         self.scroll_frame = ttk.Frame(window)
@@ -212,9 +224,39 @@ class MorphologicalProcessor:
     def _on_mousewheel(self, event):
         self.canvas.yview_scroll(int(-1*(event.delta/120)), "units")
 
+    def show_mask_editor(self):
+        if self.mask_editor is None or not self.mask_editor.winfo_exists():
+            self.mask_editor = MaskEditor(self.windows)
+        self.mask_editor.focus()
+
+
+    def update_edit_mask_button(self, event):
+        if self.edit_mask_frame:
+            self.edit_mask_frame.destroy()
+            self.edit_mask_button = None
+        
+        # Só cria o novo frame e botão se o filtro for "Customizada"
+        if self.element_var.get() == "Customizada":
+            self.windows.geometry("820x630")
+            # Cria um novo frame
+            self.edit_mask_frame = ttk.Frame(self.controls)  # controls é o primeiro filho
+            
+            self.edit_mask_frame.pack(side=tk.LEFT, padx=5, before=self.process_save_frame)
+            # Cria o botão dentro do novo frame
+            self.edit_mask_button = ttk.Button(
+                self.edit_mask_frame, 
+                text="Editar Máscara",
+                command=self.show_mask_editor
+            )
+            self.edit_mask_button.pack(fill=tk.BOTH, expand=True)
+        else:
+            self.windows.geometry("750x630")
+
     def get_structuring_element(self):
         element_type = self.element_var.get()
-        if element_type == "3x3":
+        if element_type == "Customizada":
+            return self.mask_editor.get_mask()
+        elif element_type == "3x3":
             return np.ones((3, 3), np.uint8)
         elif element_type == "Cruz":
             return np.array([[0,1,0], [1,1,1], [0,1,0]], np.uint8)
