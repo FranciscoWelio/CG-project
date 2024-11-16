@@ -130,6 +130,9 @@ class MainPage:
         lbl_rot_3d = tk.Label(frame_left3d, background="#000C66")
         lbl_rot_3d.grid(row=8, column=4, padx=5, pady=5, sticky="nsew")
 
+        entry_rot = ctk.CTkEntry(frame_left3d, placeholder_text="ang", height=10, width=40)
+        entry_rot.grid(row=5, column=1, padx=5, pady=5, sticky="nsew")
+
         # Botão para Rotação
         btn_rotate_3d = tk.Button(frame_left3d, text="Aplicar Rotação_3d", command=lambda: ogl_frame.rotacao(int(entry_rot.get())))
         btn_rotate_3d.grid(row=7, column=0, padx=5, pady=5, sticky="nsew")
