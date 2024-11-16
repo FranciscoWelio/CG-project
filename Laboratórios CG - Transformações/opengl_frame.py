@@ -87,8 +87,8 @@ class AppOgl(OpenGLFrame):
         dx = xEnd - x0
         dy = yEnd - y0
         steps = max(abs(dx), abs(dy))
-        xIncrement = dx / steps
-        yIncrement = dy / steps
+        xIncrement = dx / (steps or 1) # evita divisão por 0
+        yIncrement = dy / (steps or 1) # evita divisão por 0
         x = x0
         y = y0
         #self.draw_pixel(round(x), round(y))
