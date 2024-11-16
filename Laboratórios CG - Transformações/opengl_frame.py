@@ -328,7 +328,29 @@ class AppOgl(OpenGLFrame):
         self.DDA(point3[0], point3[1], point4[0], point4[1])
         self.DDA(point4[0], point4[1], point1[0], point1[1])
         
+    def coracao(self, seg):
         
+        inicio = time.time()
+
+        while True:
+            # Verifica se 10 segundos se passaram
+            if time.time() - inicio > seg:
+                break
+            for i in 10:
+                j = i *5
+                self.DDA(0, 0, i, j)
+            for i in 10:    
+                j = i * 5
+                self.DDA(10, 50, 10+i, -j)
+            for i in 10:
+                self.DDA(20, -50, 20+i,0)
+            # Loop de 1 segundo (simulando algo sendo executado)
+            print("Rodando...")
+
+            # Atraso de 1 segundo para simular o tempo de execução do loop
+            time.sleep(1)
+        
+            
         
     
 
