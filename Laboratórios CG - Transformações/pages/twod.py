@@ -14,10 +14,14 @@ class TwoDimensionsScreen:
         self.frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=False)
         entry_tamanho = FloatEntry(self.frame, 100, placeholder_text="size", height=10, width=40)
         entry_tamanho.grid(row=2, column=1, padx=5, pady=5, sticky="nsew")
+        entry_pos_x = FloatEntry(self.frame, 0, placeholder_text="x", height=10, width=40)
+        entry_pos_x.grid(row=2, column=2, padx=5, pady=5, sticky="nsew")
+        entry_pos_y = FloatEntry(self.frame, 0, placeholder_text="y", height=10, width=40)
+        entry_pos_y.grid(row=2, column=3, padx=5, pady=5, sticky="nsew")
 
         lbl_tamanho = tk.Label(self.frame, background="#000C66")
         lbl_tamanho.grid(row=9, column=1, padx=5, pady=5, sticky="nsew")
-        btn_desenhar_quadrado = tk.Button(self.frame, text="Desenhar Quadrado", command=lambda: ogl_frame.square_points(entry_tamanho.get_value()))
+        btn_desenhar_quadrado = tk.Button(self.frame, text="Desenhar Quadrado", command=lambda: [ogl_frame.square_points(entry_tamanho.get_value()),ogl_frame.translacao(entry_pos_x.get_value(), entry_pos_y.get_value())])
         btn_desenhar_quadrado.grid(row=2, column=0, padx=5, pady=5, sticky="nsew")
 
         # Caixa de entrada para Fator de escala Sx
