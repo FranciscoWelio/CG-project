@@ -41,7 +41,7 @@ def apply_dilation(image: np.ndarray, kernel: np.ndarray, binary=False) -> np.nd
                 region = padded[i:i+k_height, j:j+k_width]
                 # For grayscale images
                 values = region + kernel
-                output[i, j] = np.max(values) + 1
+                output[i, j] = min(np.max(values), 254) + 1
                 
     return np.clip(output, 0, 255).astype(np.uint8)
 
@@ -83,7 +83,7 @@ def apply_erosion(image: np.ndarray, kernel: np.ndarray, binary = False) -> np.n
             for j in range(img_width):
                 region = padded[i:i+k_height, j:j+k_width]
                 values = region - kernel
-                output[i, j] = np.min(values) - 1
+                output[i, j] = max(np.min(values), 1) - 1
                 
     return np.clip(output, 0, 255).astype(np.uint8)
 
@@ -271,7 +271,6 @@ class MorphologicalProcessor:
             
         kernel = self.get_structuring_element()
         operation = self.operation_var.get()
-        
         # Convert to binary if needed
         if self.image_type == "binária":
             img = cv2.threshold(self.original_image, self.binary_threshold, 255, cv2.THRESH_BINARY)[1]
