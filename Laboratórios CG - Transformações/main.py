@@ -31,6 +31,12 @@ class MainPage:
 
             self.twod_screen.hide()
             frame_left3d.pack_forget()
+
+        def show_2Q_buttons():
+            frame_left2Q.pack()
+
+            self.twod_screen.hide()
+            frame_left3d.pack_forget()
         #frame superior
         frame_top = tk.Frame(self.root, width=1200, height=20)
         frame_top.configure(background="#a0a0a0")
@@ -43,8 +49,10 @@ class MainPage:
         btn_top1Q = tk.Button(frame_top, text="Questao 1", command=show_1Q_buttons)
         btn_top1Q.grid(row=0, column=2, padx=5, pady=5)
 
+        btn_top2Q = tk.Button(frame_top, text="Questao 2", command=show_1Q_buttons)
+        btn_top2Q.grid(row=0, column=3, padx=5, pady=5)
         btn_limapr = tk.Button(frame_top, text="Limpeza", command=lambda: ogl_frame.square_points(0))
-        btn_limapr.grid(row=0, column=3, padx=5, pady=5)
+        btn_limapr.grid(row=0, column=4, padx=5, pady=5)
 
 
         # Frame para o lado esquerdo
@@ -61,6 +69,11 @@ class MainPage:
         frame_left1Q = tk.Frame(self.root, width=300, height=600)
         frame_left1Q.configure(background="#000C66")
         frame_left1Q.pack(side=tk.LEFT, fill=tk.BOTH, expand=False)
+
+        # Frame para Questão 2
+        frame_left2Q = tk.Frame(self.root, width=300, height=600)
+        frame_left2Q.configure(background="#000C66")
+        frame_left2Q.pack(side=tk.LEFT, fill=tk.BOTH, expand=False)
         # Frame para o lado direito
         frame_right.pack(side=tk.RIGHT, fill=tk.BOTH, expand=False)
 

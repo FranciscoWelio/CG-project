@@ -13,6 +13,7 @@ from Transformações import Escala
 from Transformações import Cisalhamento
 from Transformações import Reflexao
 import math
+import time
 class AppOgl(OpenGLFrame):
     def initgl(self):
         """Inicializa o ambiente OpenGL"""
