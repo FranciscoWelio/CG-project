@@ -16,7 +16,7 @@ class TwoDimensionsScreen:
 
         lbl_tamanho = tk.Label(self.frame, background="#000C66")
         lbl_tamanho.grid(row=9, column=1, padx=5, pady=5, sticky="nsew")
-        btn_desenhar_quadrado = tk.Button(self.frame, text="Desenhar Quadrado", command=lambda: ogl_frame.square_points(int(entry_tamanho.get())))
+        btn_desenhar_quadrado = tk.Button(self.frame, text="Desenhar Quadrado", command=lambda: ogl_frame.square_points(int(entry_tamanho.get())) if entry_tamanho.get() else 0 )
         btn_desenhar_quadrado.grid(row=2, column=0, padx=5, pady=5, sticky="nsew")
 
         # Caixa de entrada para Fator de escala Sx
@@ -28,7 +28,7 @@ class TwoDimensionsScreen:
         entry_sy.grid(row=3, column=2, padx=6, pady=6, sticky="nsew")
 
         # Botão para Escala
-        btn_scale = tk.Button(self.frame, text="Aplicar Escala", command=lambda: ogl_frame.escala(float(entry_sx.get()), float(entry_sy.get())))
+        btn_scale = tk.Button(self.frame, text="Aplicar Escala", command=lambda: ogl_frame.escala(float(entry_sx.get()), float(entry_sy.get())) if entry_sx.get() and entry_sy.get() else 0 )
         btn_scale.grid(row=3, column=0, padx=5, pady=5, sticky="nsew")
 
         # Caixa de entrada para Translação Tx
@@ -40,7 +40,7 @@ class TwoDimensionsScreen:
         entry_ty.grid(row=4, column=2, padx=5, pady=15, sticky="nsew")
 
         # Botão para Translação
-        btn_translate = tk.Button(self.frame, text="Aplicar Translação", command=lambda: ogl_frame.translacao(int(entry_tx.get()), int(entry_ty.get())))
+        btn_translate = tk.Button(self.frame, text="Aplicar Translação", command=lambda: ogl_frame.translacao(int(entry_tx.get()), int(entry_ty.get())) if entry_tx.get() and entry_ty.get() else 0 )
         btn_translate.grid(row=4, column=0, padx=5, pady=5, sticky="nsew")
 
         # Caixa de entrada para Rotacao
@@ -51,7 +51,7 @@ class TwoDimensionsScreen:
         lbl_rot.grid(row=5, column=0, padx=5, pady=5, sticky="nsew")
 
         # Botão para Rotação
-        btn_rotate = tk.Button(self.frame, text="Aplicar Rotação", command=lambda: ogl_frame.rotacao(int(entry_rot.get())))
+        btn_rotate = tk.Button(self.frame, text="Aplicar Rotação", command=lambda: ogl_frame.rotacao(int(entry_rot.get())) if entry_rot.get() else 0 )
         btn_rotate.grid(row=5, column=0, padx=5, pady=5, sticky="nsew")
 
         # Caixa de entrada para Fator A de cisalhamento
