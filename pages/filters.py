@@ -22,6 +22,7 @@ class ImageFilterProcessor:
         self.edit_mask_button = None
         window.title("Projeto Unidade 2 > Filtros")
         window.geometry("700x630")
+        self.windows = window
 
         ttk.Button(window, text="Voltar", command=restore).pack(pady=5)
         
@@ -156,7 +157,7 @@ class ImageFilterProcessor:
     
     def show_mask_editor(self):
         if self.mask_editor is None or not self.mask_editor.winfo_exists():
-            self.mask_editor = MaskEditor(self.window)
+            self.mask_editor = MaskEditor(self.windows)
         self.mask_editor.focus()
     
     def get_pixel_neighborhood(self, image, x, y, size=3):
@@ -342,10 +343,10 @@ class ImageFilterProcessor:
             for y in range(height):
                 for x in range(width):
                     # Obtem o valor da média a partir da imagem temporária
-                    media = temp[y, x]
+                    mediana = temp[y, x]
                     pixel_original = float(self.original_image[y, x])
                     # Realiza o calculo do valor do pixel a ser processado
-                    mascara_nitidez = pixel_original - float(media)
+                    mascara_nitidez = pixel_original - float(mediana)
                     processed_pixel = pixel_original + a*mascara_nitidez
                     processed_pixel = max(processed_pixel, 0) if processed_pixel <0 else min(processed_pixel, 255)
                     self.processed_image[y, x] = np.clip(processed_pixel, 0, 255)
