@@ -55,7 +55,6 @@ class MainPage:
         MorphologicalProcessor(self.window, self.restore)
 
         
-
     def run(self):
         self.window.mainloop()
 
