@@ -20,36 +20,37 @@ class MainPage:
 
         def show_2d_buttons() -> None:
             self.current_screen = self.twod_screen
-            self.twod_screen.show()
-            # Exibe os botões 2D
             self.three_screen.hide()
             self.q1_screen.hide()
             self.q2_screen.hide()
+            
+            self.twod_screen.show()
+            # Exibe os botões 2D
         # Esconde os botões 3D
 
         def show_3d_buttons() -> None:
             self.current_screen = self.three_screen
-            self.three_screen.show()
-
             self.twod_screen.hide()
             self.q1_screen.hide()
             self.q2_screen.hide()
+
+            self.three_screen.show()
 
         def show_1Q_buttons():
             self.current_screen = self.q1_screen
-            self.q1_screen.show()
-
             self.twod_screen.hide()
             self.three_screen.hide()
             self.q2_screen.hide()
 
+            self.q1_screen.show()
+
         def show_2Q_buttons():
             self.current_screen = self.q1_screen
-            self.q2_screen.show()
-
             self.twod_screen.hide()
             self.three_screen.hide()
             self.q1_screen.hide()
+
+            self.q2_screen.show()
         #frame superior
         frame_top = tk.Frame(self.root, width=1200, height=20)
         frame_top.configure(background="#a0a0a0")

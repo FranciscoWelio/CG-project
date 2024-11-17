@@ -9,6 +9,7 @@ from opengl_frame import AppOgl
 
 class ThreeDimensionsScreen:
     def __init__(self, window: tk.Tk) -> None:
+        self.active = False
         self.window = window
         self.frame = tk.Frame(self.window, width=300, height=600)
         self.frame.configure(background="#000C66")
@@ -109,25 +110,29 @@ class ThreeDimensionsScreen:
 
         btn_ref45_3d = tk.Button(self.frame, text="Ref Reta 45_3d", command=lambda: self.ogl_frame.reflexao45())
         btn_ref45_3d.grid(row=13, column=1, padx=5, pady=7, sticky="nsew")
-
-
+    
     def hide(self):
-        # Destroy all widgets in the frame
-        if hasattr(self, 'ogl_frame'):
-            self.ogl_frame.destroy()
-            self.ogl_frame.pack_forget()
-        for widget in self.frame.winfo_children():
-            widget.destroy()
-        
-        for widget in self.frame_right.winfo_children():
-            widget.destroy()
-        self.frame.pack_forget()
-        self.frame_right.pack_forget()
-
-        if hasattr(self, 'ogl_frame'):
-            delattr(self, 'ogl_frame')
+        if self.active:
+            self.active = False
+            if hasattr(self, 'ogl_frame'):
+                self.ogl_frame.destroy()
+                self.ogl_frame.pack_forget()
+            
+            for widget in self.frame.winfo_children():
+                widget.destroy()
+            
+            for widget in self.frame_right.winfo_children():
+                widget.destroy()
+            
+            if hasattr(self, 'ogl_frame'):
+                delattr(self, 'ogl_frame')
+            
+            self.frame.pack_forget()
+            self.frame_right.pack_forget()
     
     def show(self):
-        self.create_widgets()
-        self.frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=False)
-        self.frame_right.pack(side=tk.RIGHT, fill=tk.BOTH, expand=False)
+        if not self.active:
+            self.active = True
+            self.create_widgets()
+            self.frame.pack(side=tk.LEFT, fill=tk.BOTH)
+            self.frame_right.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)

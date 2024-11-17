@@ -1,7 +1,7 @@
 '''
     Classe que renderiza o OpenGl na tela
 '''
-
+from tkinter import Tk
 from OpenGL.GL import *
 from OpenGL.GLUT import *
 from OpenGL.GLU import *
@@ -13,8 +13,27 @@ from Transformações import Escala
 from Transformações import Cisalhamento
 from Transformações import Reflexao
 import math
-import time
+
+
 class AppOgl(OpenGLFrame):
+    def __init__(self, frame: Tk, *args, width=700, height=600, **kwargs):
+        super().__init__(frame, *args,  width=width, height=height, **kwargs)
+        self.width = width
+        self.height = height
+        self.animate = 0
+        self.frame = frame
+        self.points = []
+        self.square_points_list = []
+        self.relative_movements = [
+            (35, 0),
+            (25,50),
+            (25,-200),
+            (15, 300),
+            (20, -150),
+        ]
+        self.current_pos = [-300, 0]
+        # self.initgl()
+
     def initgl(self):
         """Inicializa o ambiente OpenGL"""
         self._after_id = None
@@ -329,29 +348,74 @@ class AppOgl(OpenGLFrame):
         self.DDA(point2[0], point2[1], point3[0], point3[1])
         self.DDA(point3[0], point3[1], point4[0], point4[1])
         self.DDA(point4[0], point4[1], point1[0], point1[1])
-        
-    def coracao(self, seg):
-        
-        inicio = time.time()
 
-        while True:
-            # Verifica se 10 segundos se passaram
-            if time.time() - inicio > seg:
-                break
-            for i in 10:
-                j = i *5
-                self.DDA(0, 0, i, j)
-            for i in 10:    
-                j = i * 5
-                self.DDA(10, 50, 10+i, -j)
-            for i in 10:
-                self.DDA(20, -50, 20+i,0)
-            # Loop de 1 segundo (simulando algo sendo executado)
-            print("Rodando...")
-
-            # Atraso de 1 segundo para simular o tempo de execução do loop
-            time.sleep(1)
+    def altura_batimento(self, t):
+        """
+        Calcula a altura do batimento cardíaco em um determinado ponto do tempo.
         
+        Args:
+            t (float): Tempo (0-100 representa um batimento completo)
+        
+        Returns:
+            float: Altura do batimento naquele instante
+        """
+        import math
+        
+        # Normaliza o tempo para o intervalo [0-100]
+        t = t % 100
+        
+        # Define as diferentes fases do batimento
+        if t < 10:  # Onda P (despolarização atrial)
+            return 0.3 * math.sin(math.pi * t / 10)
+        elif t < 20:  # Segmento PR
+            return 0
+        elif t < 25:  # Onda Q
+            return -0.3 * math.sin(math.pi * (t - 20) / 5)
+        elif t < 30:  # Onda R (pico principal)
+            return 2 * math.sin(math.pi * (t - 25) / 5)
+        elif t < 35:  # Onda S
+            return -0.5 * math.sin(math.pi * (t - 30) / 5)
+        elif t < 45:  # Segmento ST
+            return 0
+        elif t < 55:  # Onda T (repolarização ventricular)
+            return 0.4 * math.sin(math.pi * (t - 45) / 10)
+        else:  # Linha base
+            return 0
+
+    def desenhar_batimento(self):
+        """
+        Desenha uma linha de batimento cardíaco (ECG)
+        Padrão básico de ECG: linha base - pico P - complexo QRS - onda T
+        """
+
+        #self.points = [(point[0]-1, point[1]) for point in self.points if point[0]>-100]
+        glColor3f(0.0, 1.0, 0.0)  # Cor verde para o ECG
+        x_init, y_init = self.current_pos
+        x_final, y_final = self.relative_movements.pop(0)
+        if x_init > 350:
+            x_init = -350
+        self.DDA(x_init, y_init, x_init+x_final, y_init+y_final)
+        self.relative_movements.append([x_final, y_final])
+        self.points = [(point[0] - 700,point[1]) if point[0] > 350 else point for point in self.points]
+        self.points = self.points[-3000:]
+        self.current_pos = self.points[-1]
+
+    def display(self):
+        # glClear(GL_COLOR_BUFFER_BIT)
+        # glLoadIdentity()
+        
+        # Draw heart
+        self.desenhar_batimento()
+        self.frame.update_idletasks()
+        self.frame.update()
+
+    def update_animation(self):
+        if self.animate:
+            # self.time += 0.1
+            self.display()
+            # Schedule next update using Tkinter's after method
+            self.frame.after(500, self.update_animation)
+
     def destroy(self):
         self.animate = 0
         if hasattr(self, '_after_id') and self._after_id:
