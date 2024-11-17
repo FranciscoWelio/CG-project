@@ -200,7 +200,7 @@ class AppOgl(OpenGLFrame):
                 self.points.append((round(x), round(y)))
             self.update()
             return 
-        if(dx>dy) and x0 > xEnd  and y0 > yEnd: # 5 oitante
+        if(dx>dy) and x0 > xEnd  and y0 > yEnd: # 4 oitante
             ds = 2 * dy + dx
             incE = 2 * dy
             incNE = 2 * (dy + dx)
@@ -226,7 +226,110 @@ class AppOgl(OpenGLFrame):
                 self.points.append((round(x), round(y)))
 
             self.update()
+        if(dx>dy) and (x0 and xEnd) < 0 and (y0 and yEnd)<0:# 5º oitante 
+            ds = 2 * -dy + dx
+            incE = 2 * -dy
+            incNE = 2 * (-dy + dx)
+            x, y = 0, 0
+            #(-x,-y)
+          
+            if x0 < xEnd:  
+                x, y = xEnd, yEnd
+                xEnd = x0
+            else:
+                x, y = x0, y0
 
+            self.points.append((round(x), round(y)))
+
+           
+            while x > xEnd:  
+                x += 1 
+                if ds < 0:
+                    ds += incE
+                else:
+                    y += 1  
+                    ds += incNE
+                self.points.append((round(x), round(y)))
+
+            self.update()
+        if(dy>dx) and (x0 and xEnd) < 0 and (y0 and yEnd)<0:# 6º oitante 
+            ds = 2 * -dx + dx
+            incE = 2 * -dx
+            incNE = 2 * (-dx + dy)
+            x, y = 0, 0
+            #(-x,-y)
+          
+            if x0 < xEnd:  
+                x, y = xEnd, yEnd
+                xEnd = x0
+            else:
+                x, y = x0, y0
+
+            self.points.append((round(x), round(y)))
+
+           
+            while x > xEnd:  
+                x += 1 
+                if ds < 0:
+                    ds += incE
+                else:
+                    y += 1  
+                    ds += incNE
+                self.points.append((round(x), round(y)))
+
+            self.update()
+        if(dy>dx) and (x0 and xEnd) > 0 and (y0 and yEnd)<0:# 7º oitante 
+            ds = 2 * dx + dx
+            incE = 2 * dx
+            incNE = 2 * (dx + dy)
+            x, y = 0, 0
+            #(-x,-y)
+          
+            if x0 < xEnd:  
+                x, y = xEnd, yEnd
+                xEnd = x0
+            else:
+                x, y = x0, y0
+
+            self.points.append((round(x), round(y)))
+
+           
+            while x > xEnd:  
+                x += 1 
+                if ds < 0:
+                    ds += incE
+                else:
+                    y += 1  
+                    ds += incNE
+                self.points.append((round(x), round(y)))
+
+            self.update()
+        if(dx>dy) and (x0 and xEnd) > 0 and (y0 and yEnd)<0:# 8º oitante 
+            ds = 2 * -dy - dx
+            incE = 2 * -dx
+            incNE = 2 * (-dx + dy)
+            x, y = 0, 0
+            #(-x,-y)
+          
+            if x0 < xEnd:  
+                x, y = xEnd, yEnd
+                xEnd = x0
+            else:
+                x, y = x0, y0
+
+            self.points.append((round(x), round(y)))
+
+           
+            while x > xEnd:  
+                x += 1 
+                if ds < 0:
+                    ds += incE
+                else:
+                    y += 1  
+                    ds += incNE
+                self.points.append((round(x), round(y)))
+
+            self.update()
     # Método para desenhar quadrado com o ponto inferior esquerdo na origem
     def square_points(self, size):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)  # Limpa a tela antes de desenhar o quadrado
