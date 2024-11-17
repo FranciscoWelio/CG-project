@@ -18,6 +18,7 @@ class MainPage:
             # Exibe os botões 2D
             frame_left3d.pack_forget()
             frame_left1Q.pack_forget()
+            frame_left2Q.pack_forget()
         # Esconde os botões 3D
 
         def show_3d_buttons() -> None:
@@ -25,17 +26,20 @@ class MainPage:
 
             self.twod_screen.hide()
             frame_left1Q.pack_forget()  # Esconde os botões 2D
+            frame_left2Q.pack_forget()
 
         def show_1Q_buttons():
             frame_left1Q.pack()
 
             self.twod_screen.hide()
             frame_left3d.pack_forget()
+            frame_left2Q.pack_forget()
 
         def show_2Q_buttons():
             frame_left2Q.pack()
 
             self.twod_screen.hide()
+            frame_left1Q.pack_forget()
             frame_left3d.pack_forget()
         #frame superior
         frame_top = tk.Frame(self.root, width=1200, height=20)
@@ -49,7 +53,7 @@ class MainPage:
         btn_top1Q = tk.Button(frame_top, text="Questao 1", command=show_1Q_buttons)
         btn_top1Q.grid(row=0, column=2, padx=5, pady=5)
 
-        btn_top2Q = tk.Button(frame_top, text="Questao 2", command=show_1Q_buttons)
+        btn_top2Q = tk.Button(frame_top, text="Questao 2", command=show_2Q_buttons)
         btn_top2Q.grid(row=0, column=3, padx=5, pady=5)
         btn_limapr = tk.Button(frame_top, text="Limpeza", command=lambda: ogl_frame.square_points(0))
         btn_limapr.grid(row=0, column=4, padx=5, pady=5)
