@@ -119,36 +119,107 @@ class AppOgl(OpenGLFrame):
             #self.draw_pixel(round(x), round(y))
     
     def PontoMedio(self, x0, y0, xEnd, yEnd):
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         dx = abs(xEnd - x0)
         dy = abs(yEnd - y0)
-        p = 2 * dy - dx
-        twoDy = 2 * dy
-        twoDyMinusDx = 2 * (dy - dx)
-        x, y = 0, 0
 
         # Verifica se a linha está no primeiro oitante
-        if dy > dx:
-            print("Reta não se situa no 1º oitante")
-            return
-        
-        if x0 > xEnd:
-            x, y = xEnd, yEnd
-            xEnd = x0
-        else:
-            x, y = x0, y0
-            
-        self.points.append((round(x), round(y)))
-        
-        while x < xEnd:
-            x += 1
-            if p < 0:
-                p += twoDy
+        if dx > dy:
+            ds = 2 * dy - dx
+            incE = 2 * dy
+            incNE = 2 * (dy - dx)
+            x, y = 0, 0
+            if x0 > xEnd:
+                x, y = xEnd, yEnd
+                xEnd = x0
             else:
-                y += 1
-                p += twoDyMinusDx
+                x, y = x0, y0
+                
             self.points.append((round(x), round(y)))
-        self.update()
+            
+            while x < xEnd:
+                x += 1
+                if ds < 0:
+                    ds += incE
+                else:
+                    y += 1
+                    ds += incNE
+                self.points.append((round(x), round(y)))
+            self.update()
+        if dy > dx:
+            ds = 2 * dx - dy  # Ajustado para (y, x)
+            incE = 2 * dx     # Ajustado para incremento E
+            incNE = 2 * (dx - dy)  # Ajustado para incremento NE
+            x, y = 0, 0
+
+            # Configura os pontos iniciais com base na direção de y
+            if y0 > yEnd:
+                x, y = xEnd, yEnd
+                yEnd = y0
+            else:
+                x, y = x0, y0
+
+            self.points.append((round(x), round(y)))
+
+            # Traça a linha enquanto y incrementa até yEnd
+            while y < yEnd:
+                y += 1
+                if ds < 0:
+                    ds += incE
+                else:
+                    x += 1  # Incremento em x, pois estamos lidando com (y, x)
+                    ds += incNE
+                self.points.append((round(x), round(y)))
+
+            self.update()
+
+        if (dy > dx) and (xEnd and x0)  <0 :
+            ds = 2 * -dx + dy
+            incE = 2 * -dx
+            incNE = -2 * (dx + dy)
+            x, y = 0, 0
+            if y0 > yEnd:
+                x, y = xEnd, yEnd
+                yEnd = y0
+            else:
+                x, y = x0, y0
+                
+            self.points.append((round(x), round(y)))
+            
+            while y < yEnd:
+                y += 1
+                if ds < 0:
+                    ds += incE
+                else:
+                    x += 1
+                    ds += incNE
+                self.points.append((round(x), round(y)))
+            self.update()
+        if(dx>dy) and (x0 and xEnd)<0:
+            ds = 2 * dy + dx  
+            incE = 2 * dy     
+            incNE = 2 * (dy + dx)  
+            x, y = 0, 0
+
+          
+            if x0 < xEnd:  
+                x, y = xEnd, yEnd
+                xEnd = x0
+            else:
+                x, y = x0, y0
+
+            self.points.append((round(x), round(y)))
+
+           
+            while x > xEnd:  
+                x += 1 
+                if ds < 0:
+                    ds += incE
+                else:
+                    y += 1  
+                    ds += incNE
+                self.points.append((round(x), round(y)))
+
+            self.update()
 
     # Método para desenhar quadrado com o ponto inferior esquerdo na origem
     def square_points(self, size):
