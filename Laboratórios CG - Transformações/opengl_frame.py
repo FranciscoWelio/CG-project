@@ -291,7 +291,6 @@ class AppOgl(OpenGLFrame):
 
             self.update()
             return
-
     # Método para desenhar quadrado com o ponto inferior esquerdo na origem
     def square_points(self, size):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)  # Limpa a tela antes de desenhar o quadrado
