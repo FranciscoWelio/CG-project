@@ -490,39 +490,6 @@ class AppOgl(OpenGLFrame):
         self.DDA(point3[0], point3[1], point4[0], point4[1])
         self.DDA(point4[0], point4[1], point1[0], point1[1])
 
-    def altura_batimento(self, t):
-        """
-        Calcula a altura do batimento cardíaco em um determinado ponto do tempo.
-        
-        Args:
-            t (float): Tempo (0-100 representa um batimento completo)
-        
-        Returns:
-            float: Altura do batimento naquele instante
-        """
-        import math
-        
-        # Normaliza o tempo para o intervalo [0-100]
-        t = t % 100
-        
-        # Define as diferentes fases do batimento
-        if t < 10:  # Onda P (despolarização atrial)
-            return 0.3 * math.sin(math.pi * t / 10)
-        elif t < 20:  # Segmento PR
-            return 0
-        elif t < 25:  # Onda Q
-            return -0.3 * math.sin(math.pi * (t - 20) / 5)
-        elif t < 30:  # Onda R (pico principal)
-            return 2 * math.sin(math.pi * (t - 25) / 5)
-        elif t < 35:  # Onda S
-            return -0.5 * math.sin(math.pi * (t - 30) / 5)
-        elif t < 45:  # Segmento ST
-            return 0
-        elif t < 55:  # Onda T (repolarização ventricular)
-            return 0.4 * math.sin(math.pi * (t - 45) / 10)
-        else:  # Linha base
-            return 0
-
     def desenhar_batimento(self):
         """
         Desenha uma linha de batimento cardíaco (ECG)
