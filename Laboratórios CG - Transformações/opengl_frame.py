@@ -122,7 +122,7 @@ class AppOgl(OpenGLFrame):
         dx = abs(xEnd - x0)
         dy = abs(yEnd - y0)
 
-        if dx > dy and (x0 < xEnd):# Verifica se a linha está no primeiro oitante
+        if dx > dy and x0 < xEnd and y0 < yEnd:# Verifica se a linha está no primeiro oitante
             ds = 2 * dy - dx
             incE = 2 * dy
             incNE = 2 * (dy - dx)
@@ -145,7 +145,7 @@ class AppOgl(OpenGLFrame):
                 self.points.append((round(x), round(y)))
             self.update()
             return 
-        if dx > dy and (x0 > xEnd): # 4 oitante
+        if dx > dy and (x0 > xEnd) and y0 < yEnd: # 4 oitante
             ds = 2 * dy - dx
             incE = 2 * dy
             incNE = 2 * (dy - dx)
@@ -163,7 +163,7 @@ class AppOgl(OpenGLFrame):
                 self.points.append((round(x), round(y)))
             self.update()
             return 
-        if dy > dx and x0 < xEnd: # 2 oitante 
+        if dy > dx and x0 < xEnd and y0 < yEnd: # 2 oitante 
             ds = 2 * dx - dy  # Ajustado para (y, x)
             incE = 2 * dx     # Ajustado para incremento E
             incNE = 2 * (dx - dy)  # Ajustado para incremento NE
@@ -182,7 +182,7 @@ class AppOgl(OpenGLFrame):
             self.update()
             return
 
-        if (dy > dx) and x0 > xEnd: # 3 oitante
+        if (dy > dx) and x0 > xEnd and y0 < yEnd: # 3 oitante
             ds = 2 * dx - dy  # Ajustado para (y, x)
             incE = 2 * dx     # Ajustado para incremento E
             incNE = 2 * (dx - dy)  # Ajustado para incremento NE
@@ -200,7 +200,7 @@ class AppOgl(OpenGLFrame):
                 self.points.append((round(x), round(y)))
             self.update()
             return 
-        if(dx>dy) and (x0 and xEnd)<0:
+        if(dx>dy) and x0 > xEnd  and y0 > yEnd: # 5 oitante
             ds = 2 * dy + dx
             incE = 2 * dy
             incNE = 2 * (dy + dx)
