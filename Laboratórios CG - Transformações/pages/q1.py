@@ -18,7 +18,7 @@ class Q1Screen:
     
     def create_widgets(self):
         self.ogl_frame = AppOgl(self.frame_right, width=700, height=600)
-        self.ogl_frame.pack(fill=tk.BOTH, expand=False)  # Definindo expand=False para manter o tamanho fixo
+        self.ogl_frame.pack(fill=tk.BOTH, expand=False)
         self.ogl_frame.animate = 1
 
         lbl_tamanho2 = tk.Label(self.frame, background="#000C66")
