@@ -33,7 +33,7 @@ class ImageOperationsProcessor:
         
         # Operation selection
         self.operation_var = tk.StringVar(value="soma")
-        operations = ["soma", "subtração", "multiplicação", "divisão"]
+        operations = ["soma", "subtração", "multiplicação", "divisão", "and", "or", "xor"]
         self.operation_combo = ttk.Combobox(controls, textvariable=self.operation_var, values=operations)
         self.operation_combo.pack(side=tk.LEFT, padx=5)
         
@@ -142,11 +142,28 @@ class ImageOperationsProcessor:
         elif operation == "subtração":
             result = img1 - img2
         elif operation == "multiplicação":
-            result = (img1 * img2) / 255.0
-        else:  # divisão
-            # Avoid division by zero
+            result = img1 * img2
+        elif operation == "divisão":
             img2[img2 == 0] = 1
-            result = (img1 / img2) * 255.0
+            result = img1 / img2
+        elif operation == "and":
+            img1 = img1 / 255.0
+            img2 = img2 / 255.0
+            result = np.minimum(img1, img2)
+            result = (result * 255).astype(np.uint8)
+        elif operation == "or":
+            img1 = img1 / 255.0
+            img2 = img2 / 255.0
+            result = np.maximum(img1, img2)
+            result = (result * 255).astype(np.uint8)
+        elif operation == "xor":
+            img_height, img_width = img1.shape
+            result = np.zeros_like(img1)
+            img1 = img1 / 255.0
+            img2 = img2 / 255.0
+            for y in range(img_height):
+                for x in range(img_width):
+                    result[y, x] = round(abs(img1[y,x] - img2[y,x]) * 255)
 
         self.result_image = np.clip(result, 0, 255).astype(np.uint8)
         self.update_display()
