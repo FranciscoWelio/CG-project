@@ -17,6 +17,7 @@ import time
 class AppOgl(OpenGLFrame):
     def initgl(self):
         """Inicializa o ambiente OpenGL"""
+        self._after_id = None
         glClearColor(0.7, 0.7, 0.7, 0.0) #Cor de fundo do openGL
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
@@ -351,7 +352,16 @@ class AppOgl(OpenGLFrame):
             # Atraso de 1 segundo para simular o tempo de execução do loop
             time.sleep(1)
         
-            
+    def destroy(self):
+        self.animate = 0
+        if hasattr(self, '_after_id') and self._after_id:
+            try:
+                self.after_cancel(self._after_id)
+            except ValueError:
+                pass  # Ignore if the after_id is invalid
+        self.update_idletasks()
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+        super().destroy()            
         
     
 
