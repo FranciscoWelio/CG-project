@@ -19,7 +19,7 @@ def shear_point(point, a, b, w):
     # Normalizando as coordenadas homogêneas resultantes
     shear_point = (shear_point_vector[0][0] / shear_point_vector[2][0], 
                         shear_point_vector[1][0] / shear_point_vector[2][0])
-    
+
     return shear_point
 
 

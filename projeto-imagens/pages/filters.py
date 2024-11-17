@@ -33,7 +33,7 @@ class ImageFilterProcessor:
         ttk.Button(self.controls, text="Carregar Imagem", command=self.load_image).pack(side=tk.LEFT, padx=5)
         
         self.filter_var = tk.StringVar(value="Média")
-        filters = ["Customizada", "Média", "Mediana", "Passa Alto Básico", "Alto Reforço(High Boost)", "Prewitt", "Sobel", "Robert", "Robert Cruzado"]
+        filters = ["Customizada", "Média", "Mediana", "Passa Alto Básico", "Alto Reforço - 1º", "Alto Reforço - 2º", "Prewitt em x", "Prewitt em y", "Prewitt Magnitude", "Sobel em x", "Sobel em y", "Sobel Magnitude", "Robert em x", "Robert em y", "Robert Magnitude", "Robert Cruzado em x", "Robert Cruzado em y", "Robert Cruzado Magnitude"]
         self.filter_combo = ttk.Combobox(self.controls, textvariable=self.filter_var, values=filters)
         self.filter_combo.pack(side=tk.LEFT, padx=5)
         # Vincula a função que atualiza o botão à mudança no dropdown
@@ -135,7 +135,7 @@ class ImageFilterProcessor:
                 command=self.show_mask_editor
             )
             self.edit_mask_button.pack(fill=tk.BOTH, expand=True)
-        elif self.filter_var.get() == "Alto Reforço(High Boost)":
+        elif self.filter_var.get() == "Alto Reforço - 1º" or self.filter_var.get() == "Alto Reforço - 2º":
             # Cria um novo frame
             self.edit_mask_frame = ttk.Frame(self.controls)  # controls é o primeiro filho
             
@@ -332,7 +332,7 @@ class ImageFilterProcessor:
             return
         elif filter_type == "Passa Alto Básico":
             kernel = np.array([[-1, -1, -1], [-1, 8, -1], [-1, -1, -1]], dtype=float)
-        elif filter_type == "Alto Reforço(High Boost)":
+        elif filter_type == "Alto Reforço - 1º":
             # Aplica filtro da média em imagem temporária
             temp = self.process_median(self.original_image)
             
@@ -352,16 +352,35 @@ class ImageFilterProcessor:
                     self.processed_image[y, x] = np.clip(processed_pixel, 0, 255)
             self.update_display()
             return
-        elif filter_type == "Gradiente em y":
-            kernel = np.array([[0, 0, 0], [0, 1, -1], [0, -1, -1]], dtype=float)
-        elif filter_type == "Prewitt":
+        elif filter_type == "Alto Reforço - 2º":
+            a = self.high_boost_a.get_value()
+            w = 9*a - 1
+            kernel = np.array([[-1, -1, -1], [ -1, w,  -1], [-1, -1, -1]], dtype=float)
+        elif filter_type == "Prewitt em x":
+            kernel = np.array([[-1, -1, -1], [ 0, 0,  0], [1, 1, 1]], dtype=float)
+        elif filter_type == "Prewitt em y":
+            kernel = np.array([[-1, 0, 1], [-1, 0, 1], [-1, 0, 1]], dtype=float)
+        elif filter_type == "Prewitt Magnitude":
             kernel = np.array([[-2, -1, 0], [-1, 0, 1], [0, 1, 2]], dtype=float)
-        elif filter_type == "Sobel":
+        elif filter_type == "Sobel em x":
+            kernel = np.array([[-1, -2, -1], [0, 0, 0], [1, 2, 1]], dtype=float)
+        elif filter_type == "Sobel em y":
+            kernel = np.array([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]], dtype=float)
+        elif filter_type == "Sobel Magnitude":
             kernel = np.array([[-2, -2, 0], [-2, 0, 2], [0, 2, 2]], dtype=float)
-        elif filter_type == "Robert":
+        elif filter_type == "Robert em x":
+            kernel = np.array([[0, 0, 0], [0, 1, 0], [0, -1, 0]], dtype=float)
+        elif filter_type == "Robert em y":
+            kernel = np.array([[0, 0, 0], [0, 1, -1], [0, 0, 0]], dtype=float)
+        elif filter_type == "Robert Magnitude":
             kernel = np.array([[0, 0, 0], [0, 2, -1], [0, -1, 0]], dtype=float)
-        else:  # Robert Cruzado
+        elif filter_type == "Robert Cruzado em x":
+            kernel = np.array([[0, 0, 0], [0, 1, 0], [0, 0, -1]], dtype=float)
+        elif filter_type == "Robert Cruzado em y":
+            kernel = np.array([[0, 0, 0], [0, 0, 1], [0, -1, 0]], dtype=float)
+        elif filter_type == "Robert Cruzado Magnitude":
             kernel = np.array([[0, 0, 0], [0, 1, 1], [0, -1, -1]], dtype=float)
+
         
         self.processed_image = self.apply_mask_manually(self.original_image, kernel)# cv2.filter2D(self.original_image, -1, kernel)
         self.update_display()
