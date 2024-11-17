@@ -45,7 +45,7 @@ class MainPage:
             self.q1_screen.show()
 
         def show_2Q_buttons():
-            self.current_screen = self.q1_screen
+            self.current_screen = self.q2_screen
             self.twod_screen.hide()
             self.three_screen.hide()
             self.q1_screen.hide()
