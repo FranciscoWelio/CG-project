@@ -174,7 +174,7 @@ class AppOgl(OpenGLFrame):
                 
             self.points.append((round(x), round(y)))
             
-            while x < xEnd:
+            while y < yEnd:
                 y += 1
                 if ds < 0:
                     ds += incE
@@ -194,7 +194,7 @@ class AppOgl(OpenGLFrame):
                 
             self.points.append((round(x), round(y)))
             
-            while x > xEnd:
+            while y > yEnd:
                 y += 1
                 if ds < 0:
                     ds += incE
@@ -501,7 +501,7 @@ class AppOgl(OpenGLFrame):
         x_final, y_final = self.relative_movements.pop(0)
         if x_init > 350:
             x_init = -350
-        self.DDA(x_init, y_init, x_init+x_final, y_init+y_final)
+        self.PontoMedio(x_init, y_init, x_init+x_final, y_init+y_final)
         self.relative_movements.append([x_final, y_final])
         self.points = [(point[0] - 700,point[1]) if point[0] > 350 else point for point in self.points]
         self.points = self.points[-3500:]
