@@ -41,21 +41,20 @@ class AppOgl(OpenGLFrame):
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
         gluOrtho2D(-self.winfo_reqwidth()/2, self.winfo_reqwidth()/2, -self.winfo_reqheight()/2, self.winfo_reqheight()/2)
-        print("width x height: ", self.winfo_reqwidth(), "x", self.winfo_reqheight())
         self.points = []  # Lista de pontos para armazenar o desenho
         self.square_points_list = [] # Lista de pontos para armazenar os vértices do quadrado
 
     def redraw(self):
         self.draw_scene()
 
-    def draw_scene(self):
+    def draw_scene(self, red = 1, green=0, blue=0):
         """Redesenha a cena OpenGL para que os objetos etc. fiquem na tela"""
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         self.draw_axes(self.winfo_reqwidth(), self.winfo_reqheight()) #Desenhar eixos X e Y
 
         # Desenha os pontos armazenados na lista
         glBegin(GL_POINTS)
-        glColor3f(1.0, 0, 0)
+        glColor3f(red, green, blue)
         for point in self.points:
             glVertex2f(point[0], point[1])
         glEnd()
@@ -183,6 +182,7 @@ class AppOgl(OpenGLFrame):
             y = math.sqrt(RR-XX)
             self.pontosCircunferencia(x,y)
             x = x+1
+
     def linePoliTrig(self, r):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         self.redraw()
@@ -389,7 +389,6 @@ class AppOgl(OpenGLFrame):
         """
 
         #self.points = [(point[0]-1, point[1]) for point in self.points if point[0]>-100]
-        glColor3f(0.0, 1.0, 0.0)  # Cor verde para o ECG
         x_init, y_init = self.current_pos
         x_final, y_final = self.relative_movements.pop(0)
         if x_init > 350:
@@ -397,7 +396,7 @@ class AppOgl(OpenGLFrame):
         self.DDA(x_init, y_init, x_init+x_final, y_init+y_final)
         self.relative_movements.append([x_final, y_final])
         self.points = [(point[0] - 700,point[1]) if point[0] > 350 else point for point in self.points]
-        self.points = self.points[-3000:]
+        self.points = self.points[-3500:]
         self.current_pos = self.points[-1]
 
     def display(self):
