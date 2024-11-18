@@ -68,9 +68,6 @@ class MainPage:
         btn_limapr = tk.Button(frame_top, text="Limpeza", command=lambda: self.current_screen.ogl_frame.square_points(0))
         btn_limapr.grid(row=0, column=4, padx=5, pady=5)
 
-
-        # Frame para o lado esquerdo
-        frame_right = tk.Frame(self.root)
         # ogl_frame = AppOgl(frame_right, width=700, height=600)
         self.twod_screen = TwoDimensionsScreen(self.root)
         #ogl_frame = AppOgl(frame_right, width=700, height=600)

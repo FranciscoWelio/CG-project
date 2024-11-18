@@ -1,3 +1,4 @@
+from typing import Tuple
 import numpy as np
 from pygame.locals import *
 from OpenGL.GL import *
@@ -69,15 +70,11 @@ def rotate_pointX(point, ang, w):
     
     return rotated_point
 
-def realizar_rotacao(square_points_list, angle):
+def realizar_rotacao(eixo: str, cube_points_list: Tuple[int,int,int], angle: int):
 
-    point1, point2, point3, point4 = square_points_list
-
-    # Rotacionar os pontos
-    point1 = rotate_point(point1, angle, 1)
-    point2 = rotate_point(point2, angle, 1)
-    point3 = rotate_point(point3, angle, 1)
-    point4 = rotate_point(point4, angle, 1)
-
-    # retornar os vertices do quadrado após a rotação
-    return [point1, point2, point3, point4]
+    if eixo == "em x":
+        return [rotate_pointX(point, angle, 1) for point in cube_points_list]
+    elif eixo == "em y":
+        return [rotate_pointY(point, angle, 1) for point in cube_points_list]
+    else:
+        return [rotate_pointZ(point, angle, 1) for point in cube_points_list]

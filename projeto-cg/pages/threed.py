@@ -62,23 +62,38 @@ class ThreeDimensionsScreen:
         btn_translate_3d = tk.Button(self.frame, text="Aplicar Translação_3d", command=lambda: self.ogl_frame.translacao3D(entry_tx.get_value(), entry_ty.get_value(), entry_tz.get()))
         btn_translate_3d.grid(row=5, column=0, padx=5, pady=5, sticky="nsew")
 
-        # Caixa de entrada para Rotacao
-        entry_rot_x = ctk.CTkEntry(self.frame, placeholder_text="ang_3dX", height=10, width=40)
-        entry_rot_x.grid(row=7, column=1, padx=5, pady=2, sticky="nsew")
-        entry_rot_y = ctk.CTkEntry(self.frame, placeholder_text="ang_3dY", height=10, width=40)
-        entry_rot_y.grid(row=8, column=0, padx=5, pady=2, sticky="nsew")
-        entry_rot_z = ctk.CTkEntry(self.frame, placeholder_text="ang_3dZ", height=10, width=40)
-        entry_rot_z.grid(row=8, column=1, padx=5, pady=2, sticky="nsew")
+        options = ["em x", "em y", "em z"]
+        selected_option = tk.StringVar()
+        selected_option.set(options[0])
+
+        rotation_frame = tk.Frame(self.frame)
+        rotation_frame.configure(background="#000C66")
+        rotation_frame.grid(row=7, column=0, columnspan=4, sticky="w")
+
+        # Radio buttons for rotation axis
+        options = ["em x", "em y", "em z"]
+        selected_option = tk.StringVar()
+        selected_option.set(options[0])
+        
+        for i, option in enumerate(options):
+            tk.Radiobutton(
+                rotation_frame,
+                text=option,
+                value=option,
+                variable=selected_option
+            ).grid(row=0, column=i+1, padx=1)
+        
+        # Entry for angle
+        angle_entry = tk.Entry(rotation_frame, width=8)
+        angle_entry.insert(0, "ang")
+        angle_entry.grid(row=0, column=4)
+
+        # Botão para Rotação
+        rotation_button = tk.Button(rotation_frame, text="Aplicar Rotação_3d", command=lambda: self.ogl_frame.rotacao3D(selected_option.get(), int(angle_entry.get())))
+        rotation_button.grid(row=0, column=0)
 
         lbl_rot_3d = tk.Label(self.frame, background="#000C66")
         lbl_rot_3d.grid(row=8, column=4, padx=5, pady=5, sticky="nsew")
-
-        #entry_rot = ctk.CTkEntry(self.frame, placeholder_text="ang", height=10, width=40)
-        #entry_rot.grid(row=5, column=1, padx=5, pady=5, sticky="nsew")
-
-        # Botão para Rotação
-        btn_rotate_3d = tk.Button(self.frame, text="Aplicar Rotação_3d", command=lambda: self.ogl_frame.rotacao(int(entry_rot_x.get())))
-        btn_rotate_3d.grid(row=7, column=0, padx=5, pady=5, sticky="nsew")
 
         # Caixa de entrada para Fator A de cisalhamento
         entry_a = ctk.CTkEntry(self.frame, placeholder_text="a_3d", height=10, width=40)
