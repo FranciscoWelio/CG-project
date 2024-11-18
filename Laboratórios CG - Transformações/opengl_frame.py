@@ -83,11 +83,11 @@ class AppOgl(OpenGLFrame):
             glRotatef(45, 1.0, 0, 0)  # Rotação em X
             glRotatef(-45, 0.0, 1.0, 0.0)  # Rotação em Y
             self.rotated = True
-        self.draw_axes3d((self.winfo_reqwidth()*2)//1, (self.winfo_reqheight()*2)//1, ((self.winfo_reqwidth() + self.winfo_reqheight())*2)//2) #Desenhar eixos X, Y e Z
+        self.draw_axes3d((self.winfo_reqwidth()*2)//1, (self.winfo_reqheight()*2.5)//1, ((self.winfo_reqwidth() + self.winfo_reqheight())*2)//2) #Desenhar eixos X, Y e Z
 
         # Desenha os pontos armazenados na lista
         glBegin(GL_POINTS)
-        glColor3f(1.0, 0, 0)
+        glColor3f(0.627, 0.125, 0.941)
         for point in self.points:
             glVertex3f(point[0], point[1], point[2])
         glEnd()
