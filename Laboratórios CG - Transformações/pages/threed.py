@@ -40,11 +40,11 @@ class ThreeDimensionsScreen:
         entry_sy = ctk.CTkEntry(self.frame, placeholder_text="sy_3d", height=10, width=40)
         entry_sy.grid(row=4, column=0, padx=2, pady=2, sticky="nsew")
         # Caixa de entrada para Fator de escala Sz
-        entry_sy = ctk.CTkEntry(self.frame, placeholder_text="sz_3d", height=10, width=40)
-        entry_sy.grid(row=4, column=1, padx=6, pady=6, sticky="nsew")
+        entry_sz = ctk.CTkEntry(self.frame, placeholder_text="sz_3d", height=10, width=40)
+        entry_sz.grid(row=4, column=1, padx=6, pady=6, sticky="nsew")
 
         # Botão para Escala
-        btn_scale_3d = tk.Button(self.frame, text="Aplicar Escala_3d", command=lambda: self.ogl_frame.escala(float(entry_sx.get()), float(entry_sy.get())))
+        btn_scale_3d = tk.Button(self.frame, text="Aplicar Escala_3d", command=lambda: self.ogl_frame.escala3D(float(entry_sx.get()), float(entry_sy.get()), float(entry_sz.get())))
         btn_scale_3d.grid(row=3, column=0, padx=5, pady=5, sticky="nsew")
 
         # Caixa de entrada para Translação Tx

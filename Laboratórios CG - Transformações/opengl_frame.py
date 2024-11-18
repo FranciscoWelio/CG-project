@@ -533,6 +533,15 @@ class AppOgl(OpenGLFrame):
         #Desenha o novo quadrado
         self.draw_square(*self.square_points_list) #passa os parametros da função ao desempacotar a lista (p1, p2, etc.)
 
+    def escala3D(self, sx, sy, sz):
+        #Passa os pontos do quadrado desenhado para a função de escala que retorna os novos pontos do quadrado
+
+        #Remove o quadrado anterior
+        self.points = Escala.realizar_escala3D(self.points, sx, sy, sz)
+
+        #Desenha o novo quadrado
+        #self.draw_square(*self.square_points_list) 
+
     def translacao(self, tx, ty):
         
         self.square_points_list = Translacao.realizar_translacao(self.square_points_list, tx, ty)
