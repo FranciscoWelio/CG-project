@@ -33,7 +33,7 @@ def rotate_pointY(point, ang, w):
 
     matrizTheta = np.array([[np.cos(rad), 0 , np.sin(rad),0],
                             [0, 1, 0,0],
-                            [np.sin(rad), 0, np.cos(rad),0],
+                            [-np.sin(rad), 0, np.cos(rad),0],
                             [0, 0, 0,1]])
     
     # Convertendo o ponto para um vetor coluna
