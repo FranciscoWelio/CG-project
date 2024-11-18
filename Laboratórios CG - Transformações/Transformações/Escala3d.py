@@ -20,15 +20,8 @@ def scale_point(point, sx, sy, sz, w):
     return (scaled_point_vector[0][0], scaled_point_vector[1][0], scaled_point_vector[2][0])
 
 def realizar_escala(square_points_list, sx, sy, sz): #ajustar
-    
-    point1, point2, point3, point4 = square_points_list
 
-    point1 = scale_point(point1, sx, sy, 1)
-    point2 = scale_point(point2, sx, sy, 1)
-    point3 = scale_point(point3, sx, sy, 1)
-    point4 = scale_point(point4, sx, sy, 1)
-
-    return [point1, point2, point3, point4] #ajustar
+    return [scale_point(point, sx, sy, sz, 1) for point in square_points_list] #ajustar
 
 
 

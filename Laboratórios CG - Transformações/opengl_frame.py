@@ -7,11 +7,18 @@ from OpenGL.GLUT import *
 from OpenGL.GLU import *
 from pyopengltk import OpenGLFrame
 
-from Transformações import Rotacao
-from Transformações import Translacao
-from Transformações import Escala
-from Transformações import Cisalhamento
-from Transformações import Reflexao
+from Transformações import (
+    Rotacao,
+    Translacao,
+    Escala,
+    Cisalhamento,
+    Reflexao,
+    Rotacao3D,
+    Translacao3D,
+    Escala3D,
+    Cisalhamento3D,
+    Reflexao3D
+)
 import math
 
 
@@ -142,22 +149,6 @@ class AppOgl(OpenGLFrame):
             x += xIncrement
             y += yIncrement
             self.points.append((round(x), round(y)))
-    
-    def DDA2(self, x0, y0, xEnd, yEnd):
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        dx = xEnd - x0
-        dy = yEnd - y0
-        steps = max(abs(dx), abs(dy))
-        xIncrement = dx / (steps or 1) # evita divisão por 0
-        yIncrement = dy / (steps or 1) # evita divisão por 0
-        x = x0
-        y = y0
-        #self.draw_pixel(round(x), round(y))
-        for k in range(int(steps)):
-            x += xIncrement
-            y += yIncrement
-            self.points.append((round(x), round(y), 0))
-            #self.draw_pixel(round(x), round(y))
 
     def square_points3D(self, size):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)  # Limpa a tela antes de desenhar o quadrado
@@ -426,6 +417,9 @@ class AppOgl(OpenGLFrame):
         self.DDA3D(x, y, 0, x, y, z)
         self.DDA3D(0, y, 0, 0, y, z)
 
+        self.cube_points_list = [(0, 0, 0), (x, 0, 0), (x, y, 0), (0, y, 0),
+                                 (0, 0, z), (x, 0, z), (x, y, z), (0, y, z),]
+
         # Lista de vértices do cubo
         return [
             (0, 0, 0), (x, 0, 0), (x, y, 0), (0, y, 0),
@@ -528,7 +522,7 @@ class AppOgl(OpenGLFrame):
         self.square_points_list = Escala.realizar_escala(self.square_points_list, sx, sy)
 
         #Remove o quadrado anterior
-        self.points = [] 
+        self.points = []
 
         #Desenha o novo quadrado
         self.draw_square(*self.square_points_list) #passa os parametros da função ao desempacotar a lista (p1, p2, etc.)
@@ -537,7 +531,14 @@ class AppOgl(OpenGLFrame):
         #Passa os pontos do quadrado desenhado para a função de escala que retorna os novos pontos do quadrado
 
         #Remove o quadrado anterior
-        self.points = Escala.realizar_escala3D(self.points, sx, sy, sz)
+        # self.points = Escala.realizar_escala3D(self.points, sx, sy, sz)
+        self.cube_points_list = Escala3D.realizar_escala(self.cube_points_list, sx, sy, sz)
+        
+        #Remove o quadrado anterior
+        self.points = []
+
+        self.draw_cube(*self.cube_points_list)
+        
 
         #Desenha o novo quadrado
         #self.draw_square(*self.square_points_list) 
@@ -613,11 +614,22 @@ class AppOgl(OpenGLFrame):
         self.draw_square(*self.square_points_list)
     
     #def RetaPM(self):
-    def draw_cube(self, point1, point2, point3, point4,point5, point6, point7, point8):
-        self.DDA(point1[0], point1[1], point2[0], point2[1])
-        self.DDA(point2[0], point2[1], point3[0], point3[1])
-        self.DDA(point3[0], point3[1], point4[0], point4[1])
-        self.DDA(point4[0], point4[1], point1[0], point1[1])
+    def draw_cube(self, point1, point2, point3, point4, point5, point6, point7, point8):
+        self.DDA3D(point1[0], point1[1], point1[2], point2[0], point2[1], point2[2])
+        self.DDA3D(point2[0], point2[1], point2[2], point3[0], point3[1], point3[2])
+        self.DDA3D(point3[0], point3[1], point3[2], point4[0], point4[1], point4[2])
+        self.DDA3D(point4[0], point4[1], point4[2], point1[0], point1[1], point1[2])
+
+        self.DDA3D(point1[0], point1[1], point1[2], point5[0], point5[1], point5[2])
+        self.DDA3D(point2[0], point2[1], point2[2], point6[0], point6[1], point6[2])
+        self.DDA3D(point3[0], point3[1], point3[2], point7[0], point7[1], point7[2])
+        self.DDA3D(point4[0], point4[1], point4[2], point8[0], point8[1], point8[2])
+        
+        self.DDA3D(point5[0], point5[1], point5[2], point6[0], point6[1], point6[2])
+        self.DDA3D(point6[0], point6[1], point6[2], point7[0], point7[1], point7[2])
+        self.DDA3D(point7[0], point7[1], point7[2], point8[0], point8[1], point8[2])
+        self.DDA3D(point8[0], point8[1], point8[2], point5[0], point5[1], point5[2])
+
 
     def desenhar_batimento(self):
         """
