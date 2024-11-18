@@ -48,36 +48,36 @@ class ThreeDimensionsScreen:
         btn_scale_3d.grid(row=3, column=0, padx=5, pady=5, sticky="nsew")
 
         # Caixa de entrada para Translação Tx
-        entry_tx = ctk.CTkEntry(self.frame, placeholder_text="Tx_3d", height=10, width=40)
+        entry_tx = IntEntry(self.frame, 0, placeholder_text="Tx_3d", height=10, width=40)
         entry_tx.grid(row=5, column=1, padx=5, pady=15, sticky="nsew")
 
         # Caixa de entrada para Translação Ty
-        entry_ty = ctk.CTkEntry(self.frame, placeholder_text="Ty_3d", height=10, width=40)
+        entry_ty = IntEntry(self.frame, 0, placeholder_text="Ty_3d", height=10, width=40)
         entry_ty.grid(row=6, column=0, padx=5, pady=15, sticky="nsew")
         # Caixa de entrada para Translação Tz
-        entry_tz = ctk.CTkEntry(self.frame, placeholder_text="Tz_3d", height=10, width=40)
+        entry_tz = IntEntry(self.frame, 0, placeholder_text="Tz_3d", height=10, width=40)
         entry_tz.grid(row=6, column=1, padx=5, pady=15, sticky="nsew")
 
         # Botão para Translação
-        btn_translate_3d = tk.Button(self.frame, text="Aplicar Translação_3d", command=lambda: self.ogl_frame.translacao(int(entry_tx.get()), int(entry_ty.get())))
+        btn_translate_3d = tk.Button(self.frame, text="Aplicar Translação_3d", command=lambda: self.ogl_frame.translacao3D(entry_tx.get_value(), entry_ty.get_value(), entry_tz.get()))
         btn_translate_3d.grid(row=5, column=0, padx=5, pady=5, sticky="nsew")
 
         # Caixa de entrada para Rotacao
-        entry_rot = ctk.CTkEntry(self.frame, placeholder_text="ang_3dX", height=10, width=40)
-        entry_rot.grid(row=7, column=1, padx=5, pady=2, sticky="nsew")
-        entry_rot = ctk.CTkEntry(self.frame, placeholder_text="ang_3dY", height=10, width=40)
-        entry_rot.grid(row=8, column=0, padx=5, pady=2, sticky="nsew")
-        entry_rot = ctk.CTkEntry(self.frame, placeholder_text="ang_3dZ", height=10, width=40)
-        entry_rot.grid(row=8, column=1, padx=5, pady=2, sticky="nsew")
+        entry_rot_x = ctk.CTkEntry(self.frame, placeholder_text="ang_3dX", height=10, width=40)
+        entry_rot_x.grid(row=7, column=1, padx=5, pady=2, sticky="nsew")
+        entry_rot_y = ctk.CTkEntry(self.frame, placeholder_text="ang_3dY", height=10, width=40)
+        entry_rot_y.grid(row=8, column=0, padx=5, pady=2, sticky="nsew")
+        entry_rot_z = ctk.CTkEntry(self.frame, placeholder_text="ang_3dZ", height=10, width=40)
+        entry_rot_z.grid(row=8, column=1, padx=5, pady=2, sticky="nsew")
 
         lbl_rot_3d = tk.Label(self.frame, background="#000C66")
         lbl_rot_3d.grid(row=8, column=4, padx=5, pady=5, sticky="nsew")
 
-        entry_rot = ctk.CTkEntry(self.frame, placeholder_text="ang", height=10, width=40)
-        entry_rot.grid(row=5, column=1, padx=5, pady=5, sticky="nsew")
+        #entry_rot = ctk.CTkEntry(self.frame, placeholder_text="ang", height=10, width=40)
+        #entry_rot.grid(row=5, column=1, padx=5, pady=5, sticky="nsew")
 
         # Botão para Rotação
-        btn_rotate_3d = tk.Button(self.frame, text="Aplicar Rotação_3d", command=lambda: self.ogl_frame.rotacao(int(entry_rot.get())))
+        btn_rotate_3d = tk.Button(self.frame, text="Aplicar Rotação_3d", command=lambda: self.ogl_frame.rotacao(int(entry_rot_x.get())))
         btn_rotate_3d.grid(row=7, column=0, padx=5, pady=5, sticky="nsew")
 
         # Caixa de entrada para Fator A de cisalhamento
