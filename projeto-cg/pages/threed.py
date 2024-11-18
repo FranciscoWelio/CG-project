@@ -119,7 +119,7 @@ class ThreeDimensionsScreen:
         entry_c = self.create_labeled_entry(cisalhamento_frame, "Em X:", 60)
         ttk.Button(cisalhamento_frame, text="Aplicar Cisalhamento",
                   command=lambda: self.ogl_frame.cisalhamento3D(int(entry_a.get()), 
-                                                             int(entry_b.get()),
+                                                             -int(entry_b.get()),
                                                              int(entry_c.get()))).pack(pady=2)
 
         # === Seção Reflexão ===

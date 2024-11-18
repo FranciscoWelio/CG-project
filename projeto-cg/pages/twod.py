@@ -94,7 +94,7 @@ class TwoDimensionsScreen:
         btn_ref45.grid(row=8, column=2, padx=5, pady=7, sticky="nsew")
 
         # Botões para Aplicar Todos
-        btn_AplicarAll = tk.Button(self.frame, text="Aplicar Transformações", command=lambda: [self.ogl_frame.translacao(-entry_pos_x.get_value(), -entry_pos_y.get_value()), self.ogl_frame.escala(entry_sx.get_value(), entry_sy.get_value()), self.ogl_frame.rotacao(entry_rot.get_value()),self.ogl_frame.cisalhamento(entry_a.get_value(), entry_b.get_value()),self.ogl_frame.translacao(entry_pos_x.get_value(), entry_pos_y.get_value())])
+        btn_AplicarAll = tk.Button(self.frame, text="Aplicar Transformações", command=lambda: [self.ogl_frame.translacao(-entry_pos_x.get_value(), -entry_pos_y.get_value()),self.ogl_frame.translacao(int(entry_tx.get()), int(entry_ty.get())), self.ogl_frame.escala(entry_sx.get_value(), entry_sy.get_value()), self.ogl_frame.rotacao(entry_rot.get_value()),self.ogl_frame.cisalhamento(entry_a.get_value(), entry_b.get_value()),self.ogl_frame.translacao(entry_pos_x.get_value(), entry_pos_y.get_value())])
         btn_AplicarAll.grid(row=9, column=0, padx=5, pady=5, sticky="nsew")
 
     def hide(self):
