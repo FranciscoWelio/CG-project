@@ -1,5 +1,6 @@
 from .utils import FloatEntry, IntEntry
 import tkinter as tk
+from tkinter import ttk
 import customtkinter as ctk
 from OpenGL.GL import *
 from OpenGL.GLUT import *
@@ -11,150 +12,161 @@ class ThreeDimensionsScreen:
     def __init__(self, window: tk.Tk) -> None:
         self.active = False
         self.window = window
-        self.frame = tk.Frame(self.window, width=300, height=600)
-        self.frame.configure(background="#000C66")
         
-        self.frame_right = tk.Frame(self.window, width=300, height=600)
+        # Frame principal para conter o canvas e scrollbar
+        self.main_frame = ttk.Frame(self.window)
+        
+        # Canvas e Scrollbar para permitir rolagem
+        self.canvas = tk.Canvas(self.main_frame, background='#f0f0f0')
+        self.scrollbar = ttk.Scrollbar(self.main_frame, orient="vertical", command=self.canvas.yview)
+        
+        # Frame para conter os controles
+        self.frame = ttk.Frame(self.canvas, width=300)
+        self.frame_right = ttk.Frame(self.window, width=700)
+        
+        # Configurar o canvas
+        self.frame.bind('<Configure>', lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all")))
+        self.canvas.create_window((0, 0), window=self.frame, anchor="nw")
+        self.canvas.configure(yscrollcommand=self.scrollbar.set)
+        
+        # Configurar estilo
+        self.style = ttk.Style()
+        self.style.configure('TFrame', background='#f0f0f0')
+        self.style.configure('Control.TLabelframe', background='#f0f0f0', padding=5)
+        self.style.configure('TButton', padding=3)
+        self.style.configure('TLabel', background='#f0f0f0', padding=2)
+
+    def create_labeled_entry(self, parent, label, width=10):
+        """Criar uma entrada com label"""
+        container = ttk.Frame(parent)
+        container.pack(fill='x', padx=2, pady=2)
+        ttk.Label(container, text=label).pack(side='left', padx=2)
+        entry = ctk.CTkEntry(container, height=25, width=width)
+        entry.pack(side='right', padx=2)
+        return entry
 
     def create_widgets(self):
+        # OpenGL Frame
         self.ogl_frame = AppOgl(self.frame_right, width=700, height=600, threed=True)
-        self.ogl_frame.pack(fill=tk.BOTH, expand=False)  # Definindo expand=False para manter o tamanho fixo
+        self.ogl_frame.pack(fill=tk.BOTH, expand=True)
         self.ogl_frame.animate = 1
-        # COMEÇO 3d
-        # Caixa de entrada para o tamanho do quadrado
-        entry_tamanho_3d = ctk.CTkEntry(self.frame, placeholder_text="size", height=10, width=40)
-        entry_tamanho_3d.grid(row=2, column=1, sticky="nsew")
 
-        lbl_tamanho_3d = tk.Label(self.frame, background="#000C66")
-        lbl_tamanho_3d.grid(row=9, column=0, padx=5, pady=5, sticky="nsew")
+        # === Seção Cubo ===
+        cubo_frame = ttk.LabelFrame(self.frame, text="Cubo", padding=5)
+        cubo_frame.pack(fill='x', padx=5, pady=2)
         
-        # Botão para desenhar um quadrado
-        btn_desenhar_quadrado_3d = tk.Button(self.frame, text="Desenhar Cubo", command=lambda: self.ogl_frame.cube_points(int(entry_tamanho_3d.get())))
-        btn_desenhar_quadrado_3d.grid(row=2, column=0, padx=2, pady=2, sticky="nsew")
+        entry_tamanho_3d = self.create_labeled_entry(cubo_frame, "Tamanho:", 60)
+        ttk.Button(cubo_frame, text="Desenhar Cubo", 
+                  command=lambda: self.ogl_frame.cube_points(int(entry_tamanho_3d.get()))).pack(pady=2)
 
-        # Caixa de entrada para Fator de escala Sx
-        entry_sx = ctk.CTkEntry(self.frame, placeholder_text="sx_3d", height=10, width=40)
-        entry_sx.grid(row=3, column=1, padx=2, pady=2, sticky="nsew")
-
-        # Caixa de entrada para Fator de escala Sy
-        entry_sy = ctk.CTkEntry(self.frame, placeholder_text="sy_3d", height=10, width=40)
-        entry_sy.grid(row=4, column=0, padx=2, pady=2, sticky="nsew")
-        # Caixa de entrada para Fator de escala Sz
-        entry_sz = ctk.CTkEntry(self.frame, placeholder_text="sz_3d", height=10, width=40)
-        entry_sz.grid(row=4, column=1, padx=6, pady=6, sticky="nsew")
-
-        # Botão para Escala
-        btn_scale_3d = tk.Button(self.frame, text="Aplicar Escala_3d", command=lambda: self.ogl_frame.escala3D(float(entry_sx.get()), float(entry_sy.get()), float(entry_sz.get())))
-        btn_scale_3d.grid(row=3, column=0, padx=5, pady=5, sticky="nsew")
-
-        # Caixa de entrada para Translação Tx
-        entry_tx = IntEntry(self.frame, 0, placeholder_text="Tx_3d", height=10, width=40)
-        entry_tx.grid(row=5, column=1, padx=5, pady=15, sticky="nsew")
-
-        # Caixa de entrada para Translação Ty
-        entry_ty = IntEntry(self.frame, 0, placeholder_text="Ty_3d", height=10, width=40)
-        entry_ty.grid(row=6, column=0, padx=5, pady=15, sticky="nsew")
-        # Caixa de entrada para Translação Tz
-        entry_tz = IntEntry(self.frame, 0, placeholder_text="Tz_3d", height=10, width=40)
-        entry_tz.grid(row=6, column=1, padx=5, pady=15, sticky="nsew")
-
-        # Botão para Translação
-        btn_translate_3d = tk.Button(self.frame, text="Aplicar Translação_3d", command=lambda: self.ogl_frame.translacao3D(entry_tx.get_value(), entry_ty.get_value(), entry_tz.get()))
-        btn_translate_3d.grid(row=5, column=0, padx=5, pady=5, sticky="nsew")
-
-        rotation_frame = tk.Frame(self.frame)
-        rotation_frame.configure(background="#000C66")
-        rotation_frame.grid(row=7, column=0, columnspan=4, sticky="w")
-
-        # Radio buttons for rotation axis
-        options = ["em x", "em y", "em z"]
-        selected_option = tk.StringVar()
-        selected_option.set(options[0])
+        # === Seção Escala ===
+        escala_frame = ttk.LabelFrame(self.frame, text="Escala", padding=5)
+        escala_frame.pack(fill='x', padx=5, pady=2)
         
-        for i, option in enumerate(options):
-            tk.Radiobutton(
-                rotation_frame,
-                text=option,
-                value=option,
-                variable=selected_option
-            ).grid(row=0, column=i+1, padx=1)
+        entry_sx = self.create_labeled_entry(escala_frame, "X:", 60)
+        entry_sy = self.create_labeled_entry(escala_frame, "Y:", 60)
+        entry_sz = self.create_labeled_entry(escala_frame, "Z:", 60)
+        ttk.Button(escala_frame, text="Aplicar Escala", 
+                  command=lambda: self.ogl_frame.escala3D(float(entry_sx.get()), 
+                                                        float(entry_sy.get()), 
+                                                        float(entry_sz.get()))).pack(pady=2)
+
+        # === Seção Translação ===
+        translacao_frame = ttk.LabelFrame(self.frame, text="Translação", padding=5)
+        translacao_frame.pack(fill='x', padx=5, pady=2)
         
-        # Entry for angle
-        angle_entry = tk.Entry(rotation_frame, width=8)
-        angle_entry.insert(0, "ang")
-        angle_entry.grid(row=0, column=4)
+        entry_tx = self.create_labeled_entry(translacao_frame, "X:", 60)
+        entry_ty = self.create_labeled_entry(translacao_frame, "Y:", 60)
+        entry_tz = self.create_labeled_entry(translacao_frame, "Z:", 60)
+        ttk.Button(translacao_frame, text="Aplicar Translação",
+                  command=lambda: self.ogl_frame.translacao3D(int(entry_tx.get()), 
+                                                           int(entry_ty.get()), 
+                                                           int(entry_tz.get()))).pack(pady=2)
 
-        # Botão para Rotação
-        rotation_button = tk.Button(rotation_frame, text="Aplicar Rotação_3d", command=lambda: self.ogl_frame.rotacao3D(selected_option.get(), int(angle_entry.get())))
-        rotation_button.grid(row=0, column=0)
-
-        lbl_rot_3d = tk.Label(self.frame, background="#000C66")
-        lbl_rot_3d.grid(row=8, column=4, padx=5, pady=5, sticky="nsew")
-
-        # Caixa de entrada para Fator A de cisalhamento
-        entry_a = ctk.CTkEntry(self.frame, placeholder_text="a_3d", height=10, width=40)
-        entry_a.grid(row=9, column=1, padx=5, pady=5, sticky="nsew")
-
-        # Caixa de entrada para Fator B de cisalhamento
-        entry_b = ctk.CTkEntry(self.frame, placeholder_text="b_3d", height=10, width=40)
-        entry_b.grid(row=10, column=0, padx=5, pady=5, sticky="nsew")
-        # Caixa de entrada para Fator B de cisalhamento
-        entry_c = ctk.CTkEntry(self.frame, placeholder_text="c_3d", height=10, width=40)
-        entry_c.grid(row=10, column=1, padx=5, pady=5, sticky="nsew")
-
-        # Botão para Cisalhamento
-        btn_shear_3d = tk.Button(self.frame, text="Aplicar Cisalhamento_3d", command=lambda: self.ogl_frame.cisalhamento3D(int(entry_a.get()), int(entry_b.get()), int(entry_c.get())))
-        btn_shear_3d.grid(row=9, column=0, padx=5, pady=5, sticky="nsew")
-
-
-        reflection_frame = tk.Frame(self.frame)
-        reflection_frame.configure(background="#000C66")
-        reflection_frame.grid(row=10, column=0, columnspan=4, sticky="w")
-
-        # Radio buttons for reflection axis
-        options = ["em xy", "em yz", "em xz"]
-        selected_option_refl = tk.StringVar()
-        selected_option_refl.set(options[0])
+        # === Seção Rotação ===
+        rotacao_frame = ttk.LabelFrame(self.frame, text="Rotação", padding=5)
+        rotacao_frame.pack(fill='x', padx=5, pady=2)
         
-        for i, option in enumerate(options):
-            tk.Radiobutton(
-                reflection_frame,
-                text=option,
-                value=option,
-                variable=selected_option_refl
-            ).grid(row=0, column=i+1, padx=1)
+        controls_frame = ttk.Frame(rotacao_frame)
+        controls_frame.pack(fill='x', pady=2)
+        
+        selected_option = tk.StringVar(value="em x")
+        ttk.Label(controls_frame, text="Eixo:").pack(side='left', padx=2)
+        ttk.Radiobutton(controls_frame, text="X", value="em x", 
+                       variable=selected_option).pack(side='left', padx=2)
+        ttk.Radiobutton(controls_frame, text="Y", value="em y", 
+                       variable=selected_option).pack(side='left', padx=2)
+        ttk.Radiobutton(controls_frame, text="Z", value="em z", 
+                       variable=selected_option).pack(side='left', padx=2)
+        
+        angle_frame = ttk.Frame(rotacao_frame)
+        angle_frame.pack(fill='x', pady=2)
+        ttk.Label(angle_frame, text="Ângulo:").pack(side='left', padx=2)
+        angle_entry = ttk.Entry(angle_frame, width=10)
+        angle_entry.pack(side='left', padx=2)
+        angle_entry.insert(0, "0")
+        
+        ttk.Button(rotacao_frame, text="Aplicar Rotação",
+                  command=lambda: self.ogl_frame.rotacao3D(selected_option.get(), 
+                                                        int(angle_entry.get()))).pack(pady=2)
 
-        reflection_button = tk.Button(reflection_frame, text="Aplicar Reflexao_3d", command=lambda: self.ogl_frame.reflexao3D(selected_option_refl.get()))
-        reflection_button.grid(row=0, column=0)
+        # === Seção Cisalhamento ===
+        cisalhamento_frame = ttk.LabelFrame(self.frame, text="Cisalhamento", padding=5)
+        cisalhamento_frame.pack(fill='x', padx=5, pady=2)
+        
+        entry_a = self.create_labeled_entry(cisalhamento_frame, "Em Z:", 60)
+        entry_b = self.create_labeled_entry(cisalhamento_frame, "Em Y:", 60)
+        entry_c = self.create_labeled_entry(cisalhamento_frame, "Em X:", 60)
+        ttk.Button(cisalhamento_frame, text="Aplicar Cisalhamento",
+                  command=lambda: self.ogl_frame.cisalhamento3D(int(entry_a.get()), 
+                                                             int(entry_b.get()),
+                                                             int(entry_c.get()))).pack(pady=2)
 
-        btn_reforigem_3d = tk.Button(self.frame, text="Ref Origem_3d", command=lambda: self.ogl_frame.reflexaoOrigem())
-        btn_reforigem_3d.grid(row=13, column=0, padx=5, pady=6, sticky="nsew")
+        # === Seção Reflexão ===
+        reflexao_frame = ttk.LabelFrame(self.frame, text="Reflexão", padding=5)
+        reflexao_frame.pack(fill='x', padx=5, pady=2)
+        
+        controls_refl = ttk.Frame(reflexao_frame)
+        controls_refl.pack(fill='x', pady=2)
+        
+        selected_option_refl = tk.StringVar(value="em xy")
+        ttk.Label(controls_refl, text="Plano:").pack(side='left', padx=2)
+        ttk.Radiobutton(controls_refl, text="XY", value="em xy", 
+                       variable=selected_option_refl).pack(side='left', padx=2)
+        ttk.Radiobutton(controls_refl, text="YZ", value="em yz", 
+                       variable=selected_option_refl).pack(side='left', padx=2)
+        ttk.Radiobutton(controls_refl, text="XZ", value="em xz", 
+                       variable=selected_option_refl).pack(side='left', padx=2)
+        
+        buttons_frame = ttk.Frame(reflexao_frame)
+        buttons_frame.pack(fill='x', pady=2)
+        
+        ttk.Button(buttons_frame, text="Aplicar Reflexão",
+                  command=lambda: self.ogl_frame.reflexao3D(selected_option_refl.get())).pack(side='left', padx=2)
+        ttk.Button(buttons_frame, text="Reflexão na Origem",
+                  command=self.ogl_frame.reflexaoOrigem).pack(side='left', padx=2)
+        ttk.Button(buttons_frame, text="Reflexão 45°",
+                  command=self.ogl_frame.reflexao45).pack(side='left', padx=2)
 
-        btn_ref45_3d = tk.Button(self.frame, text="Ref Reta 45_3d", command=lambda: self.ogl_frame.reflexao45())
-        btn_ref45_3d.grid(row=13, column=1, padx=5, pady=7, sticky="nsew")
-    
     def hide(self):
         if self.active:
             self.active = False
             if hasattr(self, 'ogl_frame'):
                 self.ogl_frame.destroy()
-                self.ogl_frame.pack_forget()
             
-            for widget in self.frame.winfo_children():
-                widget.destroy()
-            
-            for widget in self.frame_right.winfo_children():
-                widget.destroy()
+            self.main_frame.pack_forget()
+            self.frame_right.pack_forget()
             
             if hasattr(self, 'ogl_frame'):
                 delattr(self, 'ogl_frame')
-            
-            self.frame.pack_forget()
-            self.frame_right.pack_forget()
     
     def show(self):
         if not self.active:
             self.active = True
             self.create_widgets()
-            self.frame.pack(side=tk.LEFT, fill=tk.BOTH)
+            
+            # Configurar layout dos frames principais
+            self.main_frame.pack(side=tk.LEFT, fill=tk.BOTH)
+            self.canvas.pack(side=tk.LEFT, fill=tk.BOTH)
+            self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
             self.frame_right.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
