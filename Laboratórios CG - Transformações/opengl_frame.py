@@ -117,7 +117,7 @@ class AppOgl(OpenGLFrame):
         glVertex3f(-width/2, 0.0, 0.0)
         glVertex3f(width/2, 0.0, 0.0)
         
-        # Eixo Y (verde) 
+        # Eixo Y (verde)
         glColor3f(0.0, 1.0, 0.0)
         glVertex3f(0.0, -height/2, 0.0)
         glVertex3f(0.0, height/2, 0.0)
@@ -558,7 +558,7 @@ class AppOgl(OpenGLFrame):
 
         #Remove o quadrado anterior
         # self.points = Escala.realizar_escala3D(self.points, sx, sy, sz)
-        self.cube_points_list = Translacao3D.realizar_translacao(self.cube_points_list, tx, tx, tz)
+        self.cube_points_list = Translacao3D.realizar_translacao(self.cube_points_list, tx, ty, tz)
         
         #Remove o quadrado anterior
         self.points = []
