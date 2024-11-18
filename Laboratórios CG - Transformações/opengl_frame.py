@@ -16,7 +16,7 @@ import math
 
 
 class AppOgl(OpenGLFrame):
-    def __init__(self, frame: Tk, *args, width=700, height=600, **kwargs):
+    def __init__(self, frame: Tk, *args, width=700, height=600, threed=False, **kwargs):
         super().__init__(frame, *args,  width=width, height=height, **kwargs)
         self.width = width
         self.height = height
@@ -32,20 +32,35 @@ class AppOgl(OpenGLFrame):
             (20, -150),
         ]
         self.current_pos = [-300, 0]
+        self.threed = threed
+        self.rotated = False
         # self.initgl()
 
     def initgl(self):
         """Inicializa o ambiente OpenGL"""
         self._after_id = None
-        glClearColor(0.7, 0.7, 0.7, 0.0) #Cor de fundo do openGL
-        glMatrixMode(GL_PROJECTION)
-        glLoadIdentity()
-        gluOrtho2D(-self.winfo_reqwidth()/2, self.winfo_reqwidth()/2, -self.winfo_reqheight()/2, self.winfo_reqheight()/2)
+        if not self.threed:
+            glClearColor(0.7, 0.7, 0.7, 0.0) #Cor de fundo do openGL
+            glMatrixMode(GL_PROJECTION)
+            glLoadIdentity()
+            gluOrtho2D(-self.winfo_reqwidth()/2, self.winfo_reqwidth()/2, -self.winfo_reqheight()/2, self.winfo_reqheight()/2)
+        else:
+            glClearColor(0.7, 0.7, 0.7, 0.0)
+            glMatrixMode(GL_PROJECTION)
+            glLoadIdentity()
+            glFrustum(-10.0, 10.0, -10.0, 10.0, 20, 3000.0)
+            #glMatrixMode(GL_MODELVIEW)
+            #glLoadIdentity()
+            glTranslatef(0.0, 0.0, -500.0)
+            glPointSize(1.0)
         self.points = []  # Lista de pontos para armazenar o desenho
         self.square_points_list = [] # Lista de pontos para armazenar os vértices do quadrado
 
     def redraw(self):
-        self.draw_scene()
+        if self.threed:
+            self.draw_scene3D()
+        else:
+            self.draw_scene()
 
     def draw_scene(self, red = 1, green=0, blue=0):
         """Redesenha a cena OpenGL para que os objetos etc. fiquem na tela"""
@@ -64,13 +79,17 @@ class AppOgl(OpenGLFrame):
     def draw_scene3D(self):
         """Redesenha a cena OpenGL para que os objetos etc. fiquem na tela"""
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        self.draw_axes(self.winfo_reqwidth(), self.winfo_reqheight()) #Desenhar eixos X e Y
+        if not self.rotated:
+            glRotatef(45, 1.0, 0, 0)  # Rotação em X
+            glRotatef(-45, 0.0, 1.0, 0.0)  # Rotação em Y
+            self.rotated = True
+        self.draw_axes3d((self.winfo_reqwidth()*2)//1, (self.winfo_reqheight()*2)//1, ((self.winfo_reqwidth() + self.winfo_reqheight())*2)//2) #Desenhar eixos X, Y e Z
 
         # Desenha os pontos armazenados na lista
         glBegin(GL_POINTS)
         glColor3f(1.0, 0, 0)
         for point in self.points:
-            glVertex2f(point[0], point[1])
+            glVertex3f(point[0], point[1], point[2])
         glEnd()
 
         self.update()
@@ -84,16 +103,23 @@ class AppOgl(OpenGLFrame):
         glVertex3f(0.0, height/2, 0.0)
         glEnd()
 
-    def draw_axes3d(self, width, height,depth): #Desenhar eixos X e Y 
+    def draw_axes3d(self, width, height, depth):
         glBegin(GL_LINES)
-        glColor3f(0.30, 0.30, 0.30)  # Cor para o eixo x
+        # Eixo X (vermelho)
+        glColor3f(1.0, 0.0, 0.0)
         glVertex3f(-width/2, 0.0, 0.0)
         glVertex3f(width/2, 0.0, 0.0)
-        glColor3f(0.30, 0.30, 0.30)  # Cor para o eixo y
+        
+        # Eixo Y (verde) 
+        glColor3f(0.0, 1.0, 0.0)
         glVertex3f(0.0, -height/2, 0.0)
         glVertex3f(0.0, height/2, 0.0)
+        
+        # Eixo Z (azul)
+        glColor3f(0.0, 0.0, 1.0)
         glVertex3f(0.0, 0.0, -depth/2)
         glVertex3f(0.0, 0.0, depth/2)
+        
         glEnd()
 
     def draw_pixel(self, dc_x, dc_y):
@@ -116,8 +142,69 @@ class AppOgl(OpenGLFrame):
             x += xIncrement
             y += yIncrement
             self.points.append((round(x), round(y)))
-            #self.draw_pixel(round(x), round(y))
     
+    def DDA2(self, x0, y0, xEnd, yEnd):
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+        dx = xEnd - x0
+        dy = yEnd - y0
+        steps = max(abs(dx), abs(dy))
+        xIncrement = dx / (steps or 1) # evita divisão por 0
+        yIncrement = dy / (steps or 1) # evita divisão por 0
+        x = x0
+        y = y0
+        #self.draw_pixel(round(x), round(y))
+        for k in range(int(steps)):
+            x += xIncrement
+            y += yIncrement
+            self.points.append((round(x), round(y), 0))
+            #self.draw_pixel(round(x), round(y))
+
+    def square_points3D(self, size):
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)  # Limpa a tela antes de desenhar o quadrado
+        self.points = []
+        self.square_points_list = []
+
+        # Define os pontos do quadrado
+        x = size
+        y = size
+
+        # Desenha o quadrado com o vértice inferior esquerdo na origem
+        self.DDA2(0, 0, x, 0)        # Linha inferior
+        self.DDA2(x, 0, x, y)        # Linha direita
+        self.DDA2(x, y, 0, y)        # Linha superior
+        self.DDA2(0, y, 0, 0)        # Linha esquerda
+
+        # Lista de pontos do quadrado com ponto inferior esquerdo na origem
+        self.square_points_list = [(0, 0), (x, 0), (x, y), (0, y)]
+
+        return (0, 0), (x, 0), (x, y), (0, y)
+
+    def DDA3D(self, x0, y0, z0, xEnd, yEnd, zEnd):
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+        
+        dx = xEnd - x0
+        dy = yEnd - y0
+        dz = zEnd - z0
+        
+        # Determine the number of steps based on the largest distance
+        steps = max(abs(dx), abs(dy), abs(dz))
+        
+        # Calculate increments for each axis
+        xIncrement = dx / (steps or 1)
+        yIncrement = dy / (steps or 1)
+        zIncrement = dz / (steps or 1)
+        
+        x = x0
+        y = y0
+        z = z0
+        
+        # Store points in 3D
+        for k in range(int(steps)):
+            x += xIncrement
+            y += yIncrement
+            z += zIncrement
+            self.points.append((round(x), round(y), round(z)))
+
     def PontoMedio(self, x0, y0, xEnd, yEnd):
         dx = abs(xEnd - x0)
         dy = abs(yEnd - y0)
@@ -311,6 +398,39 @@ class AppOgl(OpenGLFrame):
         self.square_points_list = [(0, 0), (x, 0), (x, y), (0, y)]
 
         return (0, 0), (x, 0), (x, y), (0, y)
+    
+    def cube_points(self, size):
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+        # self.cube_points_list = []
+
+        # Define dimensões do cubo
+        x = size
+        y = size
+        z = size
+
+        # Face frontal
+        self.DDA3D(0, 0, 0, x, 0, 0)
+        self.DDA3D(x, 0, 0, x, y, 0)
+        self.DDA3D(x, y, 0, 0, y, 0)
+        self.DDA3D(0, y, 0, 0, 0, 0)
+
+        # Face traseira
+        self.DDA3D(0, 0, z, x, 0, z)
+        self.DDA3D(x, 0, z, x, y, z)
+        self.DDA3D(x, y, z, 0, y, z)
+        self.DDA3D(0, y, z, 0, 0, z)
+
+        # Arestas conectoras
+        self.DDA3D(0, 0, 0, 0, 0, z)
+        self.DDA3D(x, 0, 0, x, 0, z)
+        self.DDA3D(x, y, 0, x, y, z)
+        self.DDA3D(0, y, 0, 0, y, z)
+
+        # Lista de vértices do cubo
+        return [
+            (0, 0, 0), (x, 0, 0), (x, y, 0), (0, y, 0),
+            (0, 0, z), (x, 0, z), (x, y, z), (0, y, z)
+        ]
 
     def linePoliExpli(self, r):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)

@@ -17,7 +17,7 @@ class ThreeDimensionsScreen:
         self.frame_right = tk.Frame(self.window, width=300, height=600)
 
     def create_widgets(self):
-        self.ogl_frame = AppOgl(self.frame_right, width=700, height=600)
+        self.ogl_frame = AppOgl(self.frame_right, width=700, height=600, threed=True)
         self.ogl_frame.pack(fill=tk.BOTH, expand=False)  # Definindo expand=False para manter o tamanho fixo
         self.ogl_frame.animate = 1
         # COMEÇO 3d
@@ -29,7 +29,7 @@ class ThreeDimensionsScreen:
         lbl_tamanho_3d.grid(row=9, column=0, padx=5, pady=5, sticky="nsew")
         
         # Botão para desenhar um quadrado
-        btn_desenhar_quadrado_3d = tk.Button(self.frame, text="Desenhar Cubo", command=lambda: self.ogl_frame.square_points(int(entry_tamanho_3d.get())))
+        btn_desenhar_quadrado_3d = tk.Button(self.frame, text="Desenhar Cubo", command=lambda: self.ogl_frame.cube_points(int(entry_tamanho_3d.get())))
         btn_desenhar_quadrado_3d.grid(row=2, column=0, padx=2, pady=2, sticky="nsew")
 
         # Caixa de entrada para Fator de escala Sx
