@@ -272,7 +272,7 @@ class AppOgl(OpenGLFrame):
                 
             self.points.append((round(x), round(y)))
             
-            while y > yEnd:
+            while x > xEnd:
                 y += 1
                 if ds < 0:
                     ds += incE
@@ -458,40 +458,55 @@ class AppOgl(OpenGLFrame):
         #d = (1-r)
         self.pontosCircunferencia(x,y)
         while(y>x):
-                if(d<0):
-                    d = d +(2*x +3)
-                else:
-                    d = d+ (2* (x-y)+5)
-                    y = y-1
-                x = x+1
-                self.pontosCircunferencia(x,y)
+            if(d<0):
+                d = d +(2*x +3)
+            else:
+                d = d+ (2* (x-y)+5)
+                y = y-1
+            x = x+1
+            self.pontosCircunferencia(x,y)
 
-    def linePoliElip(self, rx, ry,centro):
+    def linePoliElip(self, rx, ry, centrox, centroy):
         x = 0
         y = ry
         # Inicializa o parâmetro de decisão para a Região 1
         d1 = (ry**2) - (rx**2 * ry) + (0.25 * rx**2)
-        dx = 2 * (ry**2) * x
-        dy = 2 * (rx**2) * y
+        dx = 2 * ry**2 * x
+        dy = 2 * rx**2 * y
 
-        # Desenha os pontos na Região 1
-        self.pontosElipse(x, y,centro)
+        self.pontosElipse(x, y, centrox, centroy)  # Plota o primeiro ponto
+
+        # Região 1
         while dx < dy:
             if d1 < 0:
-                x += 1
-                dx += 2 * (ry**2)
                 d1 += dx + (ry**2)
             else:
-                x += 1
                 y -= 1
-                dx += 2 * (ry**2)
                 dy -= 2 * (rx**2)
                 d1 += dx - dy + (ry**2)
-            self.pontosElipse(x, y,centro)
+            x += 1
+            dx += 2 * (ry**2)
+            self.pontosElipse(x, y, centrox, centroy)
 
-    def pontosElipse(self, x, y,centro):
-        cx= centro
-        cy = centro  # O centro da elipse
+        # Inicializa o parâmetro de decisão para a Região 2
+        d2 = ((ry**2) * ((x + 0.5)**2)) + ((rx**2) * ((y - 1)**2)) - (rx**2 * ry**2)
+
+        # Região 2
+        while y > 0:
+            if d2 > 0:
+                d2 += (rx**2) - dy
+            else:
+                x += 1
+                dx += 2 * (ry**2)
+                d2 += dx - dy + (rx**2)
+            y -= 1
+            dy -= 2 * (rx**2)
+            self.pontosElipse(x, y, centrox, centroy)
+
+
+    def pontosElipse(self, x, y,centrox, centroy):
+        cx= centrox
+        cy = centroy  # O centro da elipse
         self.points.append((cx + x, cy + y))
         self.points.append((cx - x, cy + y))
         self.points.append((cx + x, cy - y))

@@ -58,13 +58,15 @@ class Q1Screen:
         btn_CIRC_PM.grid(row=5, column=1, padx=5, pady=5, sticky="nsew")
 
 
-        entry_R1_ELI = ctk.CTkEntry(self.frame, placeholder_text="Eixo X", height=10, width=40)
-        entry_R1_ELI.grid(row=6, column=1, padx=5, pady=5, sticky="nsew")
-        entry_R2_ELI = ctk.CTkEntry(self.frame, placeholder_text="Eixo Y", height=10, width=40)
-        entry_R2_ELI.grid(row=6, column=2, padx=5, pady=5, sticky="nsew")
-        entry_R3_ELI = ctk.CTkEntry(self.frame, placeholder_text="Raio", height=10, width=40)
-        entry_R3_ELI.grid(row=6, column=3, padx=5, pady=5, sticky="nsew")
-        btn_CIRC_ELIP = tk.Button(self.frame, text="Circun ELIP.", command=lambda: self.ogl_frame.linePoliElip(int(entry_R1_ELI.get()), int( entry_R2_ELI.get()),int( entry_R3_ELI.get()) ))
+        entry_R1_ELI = ctk.CTkEntry(self.frame, placeholder_text="Tamanho X", height=10, width=40)
+        entry_R1_ELI.grid(row=7, column=0, padx=5, pady=5, sticky="nsew")
+        entry_R2_ELI = ctk.CTkEntry(self.frame, placeholder_text="Tamanho Y", height=10, width=40)
+        entry_R2_ELI.grid(row=7, column=1, padx=5, pady=5, sticky="nsew")
+        entry_R3_ELI = ctk.CTkEntry(self.frame, placeholder_text="Eixo X", height=10, width=40)
+        entry_R3_ELI.grid(row=7, column=2, padx=5, pady=5, sticky="nsew")
+        entry_R4_ELI = ctk.CTkEntry(self.frame, placeholder_text="Eixo Y", height=10, width=40)
+        entry_R4_ELI.grid(row=7, column=3, padx=5, pady=5, sticky="nsew")
+        btn_CIRC_ELIP = tk.Button(self.frame, text="Circun ELIP.", command=lambda: self.ogl_frame.linePoliElip(int(entry_R1_ELI.get()), int( entry_R2_ELI.get()),int( entry_R3_ELI.get()) ,int( entry_R4_ELI.get())))
         btn_CIRC_ELIP.grid(row=6, column=0, padx=5, pady=5, sticky="nsew")
 
     def hide(self):
