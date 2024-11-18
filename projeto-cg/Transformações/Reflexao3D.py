@@ -1,3 +1,4 @@
+from typing import Tuple
 import numpy as np
 from pygame.locals import *
 from OpenGL.GL import *
@@ -141,6 +142,14 @@ def realizar_reflexaoZX(square_points_list):#ajuste
 
     # retornar os vertices do quadrado após a reflexão
     return [point1, point2, point3, point4]
+
+def realizar_reflexao(eixo: str, cube_points_list: Tuple[int,int,int]):
+    if eixo == "em yz":
+        return [refYZ_point(point, 1) for point in cube_points_list]
+    elif eixo == "em xz":
+        return [refZX_point(point, 1) for point in cube_points_list]
+    else:
+        return [refXY_point(point, 1) for point in cube_points_list]
 
 def realizar_reflexaoOrigem(square_points_list):#ajuste
 

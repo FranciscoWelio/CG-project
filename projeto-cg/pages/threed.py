@@ -62,10 +62,6 @@ class ThreeDimensionsScreen:
         btn_translate_3d = tk.Button(self.frame, text="Aplicar Translação_3d", command=lambda: self.ogl_frame.translacao3D(entry_tx.get_value(), entry_ty.get_value(), entry_tz.get()))
         btn_translate_3d.grid(row=5, column=0, padx=5, pady=5, sticky="nsew")
 
-        options = ["em x", "em y", "em z"]
-        selected_option = tk.StringVar()
-        selected_option.set(options[0])
-
         rotation_frame = tk.Frame(self.frame)
         rotation_frame.configure(background="#000C66")
         rotation_frame.grid(row=7, column=0, columnspan=4, sticky="w")
@@ -103,22 +99,33 @@ class ThreeDimensionsScreen:
         entry_b = ctk.CTkEntry(self.frame, placeholder_text="b_3d", height=10, width=40)
         entry_b.grid(row=10, column=0, padx=5, pady=5, sticky="nsew")
         # Caixa de entrada para Fator B de cisalhamento
-        entry_b = ctk.CTkEntry(self.frame, placeholder_text="c_3d", height=10, width=40)
-        entry_b.grid(row=10, column=1, padx=5, pady=5, sticky="nsew")
+        entry_c = ctk.CTkEntry(self.frame, placeholder_text="c_3d", height=10, width=40)
+        entry_c.grid(row=10, column=1, padx=5, pady=5, sticky="nsew")
 
         # Botão para Cisalhamento
-        btn_shear_3d = tk.Button(self.frame, text="Aplicar Cisalhamento_3d", command=lambda: self.ogl_frame.cisalhamento(int(entry_a.get()), int(entry_b.get())))
+        btn_shear_3d = tk.Button(self.frame, text="Aplicar Cisalhamento_3d", command=lambda: self.ogl_frame.cisalhamento3D(int(entry_a.get()), int(entry_b.get()), int(entry_c.get())))
         btn_shear_3d.grid(row=9, column=0, padx=5, pady=5, sticky="nsew")
 
-        # Botões para Reflexão
-        btn_refx_3d = tk.Button(self.frame, text="Ref X_3d", command=lambda: self.ogl_frame.reflexaoX())
-        btn_refx_3d.grid(row=11, column=1, padx=5, pady=5, sticky="nsew")
 
-        btn_refy_3d = tk.Button(self.frame, text="Ref Y_3d", command=lambda: self.ogl_frame.reflexaoY())
-        btn_refy_3d.grid(row=12, column=0, padx=5, pady=5, sticky="nsew")
+        reflection_frame = tk.Frame(self.frame)
+        reflection_frame.configure(background="#000C66")
+        reflection_frame.grid(row=10, column=0, columnspan=4, sticky="w")
 
-        btn_refy_3d = tk.Button(self.frame, text="Ref Z_3d", command=lambda: self.ogl_frame.reflexaoY())
-        btn_refy_3d.grid(row=12, column=1, padx=5, pady=5, sticky="nsew")
+        # Radio buttons for reflection axis
+        options = ["em xy", "em yz", "em xz"]
+        selected_option_refl = tk.StringVar()
+        selected_option_refl.set(options[0])
+        
+        for i, option in enumerate(options):
+            tk.Radiobutton(
+                reflection_frame,
+                text=option,
+                value=option,
+                variable=selected_option_refl
+            ).grid(row=0, column=i+1, padx=1)
+
+        reflection_button = tk.Button(reflection_frame, text="Aplicar Reflexao_3d", command=lambda: self.ogl_frame.reflexao3D(selected_option_refl.get()))
+        reflection_button.grid(row=0, column=0)
 
         btn_reforigem_3d = tk.Button(self.frame, text="Ref Origem_3d", command=lambda: self.ogl_frame.reflexaoOrigem())
         btn_reforigem_3d.grid(row=13, column=0, padx=5, pady=6, sticky="nsew")

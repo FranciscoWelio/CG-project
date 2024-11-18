@@ -64,7 +64,7 @@ def shear_pointY(point, a, b, w):
     
     return shear_point
 
-def shear_pointGeral(point, a, b, w):
+def shear_pointGeral(point, a, b, c, d, e, f, w):
 
     matrizCis = np.array([[1, c, e, 0],
                             [a, 1, f, 0],
@@ -83,15 +83,6 @@ def shear_pointGeral(point, a, b, w):
                         shear_point_vector[2][0] / shear_point_vector[3][0])
     
     return shear_point
-def realizar_cisalhamento(square_points_list, a, b):
-
-    point1, point2, point3, point4 = square_points_list
-
-    # Rotacionar os pontos
-    point1 = shear_point(point1, a, b, 1)
-    point2 = shear_point(point2, a, b, 1)
-    point3 = shear_point(point3, a, b, 1)
-    point4 = shear_point(point4, a, b, 1)
-
+def realizar_cisalhamento(cube_points_list, a, b, c, d, e, f):
     # retornar os vertices do quadrado após o cisalhamento
-    return [point1, point2, point3, point4]
+    return [shear_pointGeral(point, a, b, c, d, e, f, 1) for point in cube_points_list]

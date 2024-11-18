@@ -594,6 +594,29 @@ class AppOgl(OpenGLFrame):
         #Desenha o novo quadrado rotacionado
         self.draw_square(*self.square_points_list)
     
+    def cisalhamento3D(self, a, c, e):
+        b = a
+        d = c
+        f = e
+
+        self.cube_points_list = Cisalhamento3D.realizar_cisalhamento(self.cube_points_list, a, b, c, d, e, f)
+
+        #Remove o quadrado anterior
+        self.points = []
+
+        #Desenha o novo quadrado rotacionado
+        self.draw_cube(*self.cube_points_list)
+    
+    def reflexao3D(self, eixo: str):
+
+        self.cube_points_list = Reflexao3D.realizar_reflexao(eixo, self.cube_points_list)
+
+        #Remove o quadrado anterior
+        self.points = []
+
+        #Desenha o novo quadrado rotacionado
+        self.draw_cube(*self.cube_points_list)
+
     def reflexaoX(self):
 
         self.square_points_list = Reflexao.realizar_reflexaoX(self.square_points_list)
