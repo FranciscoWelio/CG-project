@@ -1,7 +1,7 @@
 import math
-from .utils import FloatEntry, IntEntry
+from .utils import FloatEntry
+from tkinter import ttk
 import tkinter as tk
-import customtkinter as ctk
 from OpenGL.GL import *
 from OpenGL.GLUT import *
 from OpenGL.GLU import *
@@ -13,131 +13,202 @@ class TwoDimensionsScreen:
     def __init__(self, window: tk.Tk) -> None:
         self.active = False
         self.window = window
-        self.frame = tk.Frame(self.window, width=300, height=600)
-        self.frame.configure(background="#000C66")
-        self.frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=False)
         
-        self.frame_right = tk.Frame(self.window, width=300, height=600)
+        # Frame principal que conterá todos os elementos
+        self.main_container = ttk.Frame(self.window)
         
-        # Create viewport window after main window is created
-        self.window.update()
-        self.viewport_window = ViewportWindow(self.window)
-        
-    def create_widgets(self):
-        self.ogl_frame = AppOgl(self.frame_right, width=700, height=600)
-        self.ogl_frame.pack(fill=tk.BOTH, expand=False)
-        self.ogl_frame.animate = 1
-        
-        # Add viewport toggle button
-        btn_toggle_viewport = tk.Button(self.frame, text="Toggle Viewport", 
-                                      command=self.toggle_viewport)
-        btn_toggle_viewport.grid(row=0, column=0, columnspan=4, padx=5, pady=5, sticky="nsew")
-        
-        entry_tamanho = FloatEntry(self.frame, 100, placeholder_text="size", height=10, width=40)
-        entry_tamanho.grid(row=2, column=1, padx=5, pady=5, sticky="nsew")
-        entry_pos_x = FloatEntry(self.frame, 0, placeholder_text="x", height=10, width=40)
-        entry_pos_x.grid(row=2, column=2, padx=5, pady=5, sticky="nsew")
-        entry_pos_y = FloatEntry(self.frame, 0, placeholder_text="y", height=10, width=40)
-        entry_pos_y.grid(row=2, column=3, padx=5, pady=5, sticky="nsew")
 
-        lbl_tamanho = tk.Label(self.frame, background="#000C66")
-        lbl_tamanho.grid(row=9, column=1, padx=5, pady=5, sticky="nsew")
+    def create_labeled_entry(self, parent, label, default_value=0, width=60):
+        """Criar uma entrada com label"""
+        container = ttk.Frame(parent)
+        container.pack(fill='x', padx=2, pady=2)
+        ttk.Label(container, text=label).pack(side='left', padx=2)
+        entry = FloatEntry(container, default_value, height=25, width=width)
+        entry.pack(side='right', padx=2)
+        return entry
+
+    def create_widgets(self):
+        self.window.update()
+        # Create viewport window
+        self.viewport_window = ViewportWindow(self.window)
+        self.main_container.pack(fill=tk.BOTH, expand=True)
         
-        # Modify the square drawing to update viewport
-        def update_viewport():
-            if hasattr(self, 'viewport_window'):
-                self.viewport_window.update_viewport(self.ogl_frame.points)
-                # Make main context current again
-                if hasattr(self, 'ogl_frame'):
-                    self.ogl_frame.tk.call('winfo', 'id', self.ogl_frame._w)
+        # Frame esquerdo para controles (menu lateral)
+        self.controls_frame = ttk.Frame(self.main_container, width=300)
+        self.controls_frame.pack(side=tk.LEFT, fill=tk.Y, padx=5, pady=5)
+        self.controls_frame.pack_propagate(False)  # Mantém o tamanho fixo
         
-        # Modified square drawing function
+        # Frame direito para a área de desenho OpenGL
+        self.right_container = ttk.Frame(self.main_container)
+        self.right_container.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        # Criar canvas de rolagem
+        self.canvas = tk.Canvas(self.controls_frame, width=280, background='#f0f0f0')
+        self.scrollbar = ttk.Scrollbar(self.controls_frame, orient="vertical", command=self.canvas.yview)
+        
+        # Frame interno do canvas
+        self.inner_frame = ttk.Frame(self.canvas)
+        
+        # Configurar canvas
+        self.canvas.create_window((0, 0), window=self.inner_frame, anchor='nw', width=280)
+        self.canvas.configure(yscrollcommand=self.scrollbar.set)
+        
+        # Posicionar canvas e scrollbar
+        self.canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        
+        # Bind para atualizar scroll
+        self.inner_frame.bind('<Configure>', lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all")))
+        
+        # Configurar estilo
+        self.style = ttk.Style()
+        self.style.configure('TFrame', background='#f0f0f0')
+        self.style.configure('Control.TLabelframe', background='#f0f0f0', padding=5)
+        self.style.configure('TButton', padding=3)
+        self.style.configure('TLabel', background='#f0f0f0', padding=2)
+        # OpenGL Frame
+        self.ogl_frame = AppOgl(self.right_container, width=700, height=600)
+        self.ogl_frame.pack(fill=tk.BOTH, expand=True)
+        self.ogl_frame.animate = 1
+
+        # === Botão Viewport ===
+        viewport_frame = ttk.LabelFrame(self.inner_frame, text="Viewport", padding=5)
+        viewport_frame.pack(fill='x', padx=5, pady=2)
+        ttk.Button(viewport_frame, text="Toggle Viewport", 
+                  command=self.toggle_viewport).pack(fill='x', pady=2)
+
+        # === Seção Quadrado ===
+        quadrado_frame = ttk.LabelFrame(self.inner_frame, text="Quadrado", padding=5)
+        quadrado_frame.pack(fill='x', padx=5, pady=2)
+        
+        entry_tamanho = self.create_labeled_entry(quadrado_frame, "Tamanho:", 100)
+        entry_pos_x = self.create_labeled_entry(quadrado_frame, "Posição X:", 0)
+        entry_pos_y = self.create_labeled_entry(quadrado_frame, "Posição Y:", 0)
+        
         def draw_square():
             self.ogl_frame.square_points(entry_tamanho.get_value())
             self.ogl_frame.translacao(entry_pos_x.get_value(), entry_pos_y.get_value())
-            update_viewport()
+            self.viewport_window.update_viewport(self.ogl_frame.points)
         
-        btn_desenhar_quadrado = tk.Button(self.frame, text="Desenhar Quadrado", 
-                                        command=draw_square)
-        btn_desenhar_quadrado.grid(row=2, column=0, padx=5, pady=5, sticky="nsew")
+        ttk.Button(quadrado_frame, text="Desenhar Quadrado",
+                  command=draw_square).pack(fill='x', pady=2)
 
-        # Caixa de entrada para Fator de escala Sx
-        entry_sx = FloatEntry(self.frame, 1, placeholder_text="sx", height=10, width=40)
-        entry_sx.grid(row=3, column=1, padx=5, pady=5, sticky="nsew")
+        # === Seção Escala ===
+        escala_frame = ttk.LabelFrame(self.inner_frame, text="Escala", padding=5)
+        escala_frame.pack(fill='x', padx=5, pady=2)
+        
+        entry_sx = self.create_labeled_entry(escala_frame, "X:", 1)
+        entry_sy = self.create_labeled_entry(escala_frame, "Y:", 1)
+        
+        ttk.Button(escala_frame, text="Aplicar Escala", 
+                  command=lambda: [
+                      self.ogl_frame.escala(entry_sx.get_value(), entry_sy.get_value()),
+                      self.viewport_window.update_viewport(self.ogl_frame.points)
+                  ]).pack(fill='x', pady=2)
 
-        # Caixa de entrada para Fator de escala Sy
-        entry_sy = FloatEntry(self.frame, 1, placeholder_text="sy", height=10, width=40)
-        entry_sy.grid(row=3, column=2, padx=6, pady=6, sticky="nsew")
+        # === Seção Translação ===
+        translacao_frame = ttk.LabelFrame(self.inner_frame, text="Translação", padding=5)
+        translacao_frame.pack(fill='x', padx=5, pady=2)
+        
+        entry_tx = self.create_labeled_entry(translacao_frame, "X:", 0)
+        entry_ty = self.create_labeled_entry(translacao_frame, "Y:", 0)
+        
+        ttk.Button(translacao_frame, text="Aplicar Translação",
+                  command=lambda: [
+                      self.ogl_frame.translacao(entry_tx.get_value(), entry_ty.get_value()),
+                      self.viewport_window.update_viewport(self.ogl_frame.points)
+                  ]).pack(fill='x', pady=2)
 
-        # Botão para Escala
-        btn_scale = tk.Button(self.frame, text="Aplicar Escala", command=lambda: [self.ogl_frame.escala(entry_sx.get_value(), entry_sy.get_value()), self.viewport_window.update_viewport(self.ogl_frame.points)])
-        btn_scale.grid(row=3, column=0, padx=5, pady=5, sticky="nsew")
+        # === Seção Rotação ===
+        rotacao_frame = ttk.LabelFrame(self.inner_frame, text="Rotação", padding=5)
+        rotacao_frame.pack(fill='x', padx=5, pady=2)
+        
+        entry_rot = self.create_labeled_entry(rotacao_frame, "Ângulo:", 0)
+        
+        ttk.Button(rotacao_frame, text="Aplicar Rotação",
+                  command=lambda: [
+                      self.ogl_frame.rotacao(entry_rot.get_value()),
+                      self.viewport_window.update_viewport(self.ogl_frame.points)
+                  ]).pack(fill='x', pady=2)
 
-        # Caixa de entrada para Translação Tx
-        entry_tx = FloatEntry(self.frame, 0, placeholder_text="Tx", height=10, width=40)
-        entry_tx.grid(row=4, column=1, padx=5, pady=15, sticky="nsew")
+        # === Seção Cisalhamento ===
+        cisalhamento_frame = ttk.LabelFrame(self.inner_frame, text="Cisalhamento", padding=5)
+        cisalhamento_frame.pack(fill='x', padx=5, pady=2)
+        
+        entry_a = self.create_labeled_entry(cisalhamento_frame, "A:", 0)
+        entry_b = self.create_labeled_entry(cisalhamento_frame, "B:", 0)
+        
+        ttk.Button(cisalhamento_frame, text="Aplicar Cisalhamento",
+                  command=lambda: [
+                      self.ogl_frame.cisalhamento(entry_a.get_value(), entry_b.get_value()),
+                      self.viewport_window.update_viewport(self.ogl_frame.points)
+                  ]).pack(fill='x', pady=2)
 
-        # Caixa de entrada para Translação Ty
-        entry_ty = FloatEntry(self.frame, 0, placeholder_text="Ty", height=10, width=40)
-        entry_ty.grid(row=4, column=2, padx=5, pady=15, sticky="nsew")
+        # === Seção Reflexão ===
+        reflexao_frame = ttk.LabelFrame(self.inner_frame, text="Reflexão", padding=5)
+        reflexao_frame.pack(fill='x', padx=5, pady=2)
+        
+        buttons_frame = ttk.Frame(reflexao_frame)
+        buttons_frame.pack(fill='x', pady=2)
+        
+        ttk.Button(buttons_frame, text="Reflexão X",
+                  command=lambda: self.ogl_frame.reflexaoX()).pack(side='left', padx=2)
+        ttk.Button(buttons_frame, text="Reflexão Y",
+                  command=lambda: self.ogl_frame.reflexaoY()).pack(side='left', padx=2)
+        
+        buttons_frame2 = ttk.Frame(reflexao_frame)
+        buttons_frame2.pack(fill='x', pady=2)
+        
+        ttk.Button(buttons_frame2, text="Reflexão na Origem",
+                  command=lambda: [self.ogl_frame.reflexaoOrigem(), 
+                                    self.viewport_window.update_viewport(self.ogl_frame.points)]
+        ).pack(side='left', padx=2)
+        ttk.Button(buttons_frame2, text="Reflexão 45°",
+                  command=lambda: [self.ogl_frame.reflexao45(),
+                  self.viewport_window.update_viewport(self.ogl_frame.points)]
+        ).pack(side='left', padx=2)
 
-        # Botão para Translação
-        btn_translate = tk.Button(self.frame, text="Aplicar Translação", command=lambda: [self.ogl_frame.translacao(int(entry_tx.get()), int(entry_ty.get())), self.viewport_window.update_viewport(self.ogl_frame.points)] if entry_tx.get() and entry_ty.get() else 0 )
-        btn_translate.grid(row=4, column=0, padx=5, pady=5, sticky="nsew")
+        # === Seção Reflexão em Reta ===
+        reta_frame = ttk.LabelFrame(self.inner_frame, text="Reflexão em Reta", padding=5)
+        reta_frame.pack(fill='x', padx=5, pady=2)
+        
+        retaA = self.create_labeled_entry(reta_frame, "A:", 0)
+        retaB = self.create_labeled_entry(reta_frame, "B:", 0)
+        
+        def reflexao_reta():
+            a = retaA.get_value()
+            b = retaB.get_value()
+            thetaCosA = (1/math.sqrt((a**2)+1))
+            thetaSinA = (a/math.sqrt((a**2)+1))
+            self.ogl_frame.translacao(0, -b)
+            self.ogl_frame.rotacaoReta(thetaCosA,-thetaSinA)
+            self.ogl_frame.reflexaoX()
+            self.ogl_frame.rotacaoReta(thetaCosA,thetaSinA)
+            self.ogl_frame.translacao(0, b)
+            
+        ttk.Button(reta_frame, text="Reflexão y = ax + b",
+                  command=lambda: [reflexao_reta(),
+                           self.viewport_window.update_viewport(self.ogl_frame.points)]
+        ).pack(fill='x', pady=2)
 
-        # Caixa de entrada para Rotacao
-        entry_rot = FloatEntry(self.frame, 0, placeholder_text="ang", height=10, width=40)
-        entry_rot.grid(row=5, column=1, padx=5, pady=5, sticky="nsew")
-
-        lbl_rot = tk.Label(self.frame, background="#000C66")
-        lbl_rot.grid(row=5, column=0, padx=5, pady=5, sticky="nsew")
-
-        # Botão para Rotação
-        btn_rotate = tk.Button(self.frame, text="Aplicar Rotação", command=lambda: [self.ogl_frame.rotacao(entry_rot.get_value()), self.viewport_window.update_viewport(self.ogl_frame.points)] )
-        btn_rotate.grid(row=5, column=0, padx=5, pady=5, sticky="nsew")
-
-        # Caixa de entrada para Fator A de cisalhamento
-        entry_a = FloatEntry(self.frame, 0, placeholder_text="a", height=10, width=40)
-        entry_a.grid(row=6, column=1, padx=5, pady=5, sticky="nsew")
-
-        # Caixa de entrada para Fator B de cisalhamento
-        entry_b = FloatEntry(self.frame, 0, placeholder_text="b", height=10, width=40)
-        entry_b.grid(row=6, column=2, padx=5, pady=5, sticky="nsew")
-
-        # Botão para Cisalhamento
-        btn_shear = tk.Button(self.frame, text="Aplicar Cisalhamento", command=lambda: [self.ogl_frame.cisalhamento(entry_a.get_value(), entry_b.get_value()), self.viewport_window.update_viewport(self.ogl_frame.points)])
-        btn_shear.grid(row=6, column=0, padx=5, pady=5, sticky="nsew")
-
-        # Botões para Reflexão
-        btn_refx = tk.Button(self.frame, text="Ref X", command=lambda: self.ogl_frame.reflexaoX())
-        btn_refx.grid(row=7, column=1, padx=5, pady=5, sticky="nsew")
-
-        btn_refy = tk.Button(self.frame, text="Ref Y", command=lambda: self.ogl_frame.reflexaoY())
-        btn_refy.grid(row=7, column=2, padx=5, pady=5, sticky="nsew")
-
-        btn_reforigem = tk.Button(self.frame, text="Ref Origem", command=lambda: self.ogl_frame.reflexaoOrigem())
-        btn_reforigem.grid(row=8, column=1, padx=5, pady=6, sticky="nsew")
-
-        btn_ref45 = tk.Button(self.frame, text="Ref Reta 45", command=lambda: self.ogl_frame.reflexao45())
-        btn_ref45.grid(row=8, column=2, padx=5, pady=7, sticky="nsew")
-
-
-        retaA = FloatEntry(self.frame, 0, placeholder_text="Ax", height=10, width=40)
-        retaA.grid(row=9, column=1, padx=5, pady=5, sticky="nsew")
-        retaB = FloatEntry(self.frame, 0, placeholder_text="B", height=10, width=40)
-        retaB.grid(row=9, column=2, padx=5, pady=5, sticky="nsew")
-        a = retaA.get_value()
-        thetaCosA = (1/math.sqrt((a**2)+1))
-        thetaSinA = (a/math.sqrt((a**2)+1))
-        btn_refReta = tk.Button(self.frame, text="Ref Reta y = ax + b", command=lambda: [self.ogl_frame.translacao(0, -retaB.get_value()), self.ogl_frame.rotacaoReta(thetaCosA,-thetaSinA),self.ogl_frame.reflexaoX(), self.ogl_frame.rotacaoReta(thetaCosA,thetaSinA), self.ogl_frame.translacao(0, retaB.get_value())])
-        btn_refReta.grid(row=9, column=0, padx=5, pady=7, sticky="nsew")
-
-        # Botões para Aplicar Todos
-        btn_AplicarAll = tk.Button(self.frame, text="Aplicar Transformações", command=lambda: [self.ogl_frame.translacao(-entry_pos_x.get_value(), -entry_pos_y.get_value()),self.ogl_frame.translacao(int(entry_tx.get()), int(entry_ty.get())), self.ogl_frame.escala(entry_sx.get_value(), entry_sy.get_value()), self.ogl_frame.rotacao(entry_rot.get_value()),self.ogl_frame.cisalhamento(entry_a.get_value(), entry_b.get_value()),self.ogl_frame.translacao(entry_pos_x.get_value(), entry_pos_y.get_value())])
-        btn_AplicarAll.grid(row=10, column=0, padx=5, pady=5, sticky="nsew")
+        # === Seção Aplicar Todas ===
+        todas_frame = ttk.LabelFrame(self.inner_frame, text="Aplicar Todas", padding=5)
+        todas_frame.pack(fill='x', padx=5, pady=2)
+        
+        def aplicar_todas():
+            self.ogl_frame.translacao(-entry_pos_x.get_value(), -entry_pos_y.get_value())
+            self.ogl_frame.translacao(entry_tx.get_value(), entry_ty.get_value())
+            self.ogl_frame.escala(entry_sx.get_value(), entry_sy.get_value())
+            self.ogl_frame.rotacao(entry_rot.get_value())
+            self.ogl_frame.cisalhamento(entry_a.get_value(), entry_b.get_value())
+            self.ogl_frame.translacao(entry_pos_x.get_value(), entry_pos_y.get_value())
+            
+        ttk.Button(todas_frame, text="Aplicar Todas Transformações",
+                  command=lambda: [aplicar_todas(),
+                                  self.viewport_window.update_viewport(self.ogl_frame.points)]
+        ).pack(fill='x', pady=2)
 
     def toggle_viewport(self):
-        """Toggle viewport window visibility"""
         if self.viewport_window.window.state() == 'withdrawn':
             self.viewport_window.show()
         else:
@@ -146,28 +217,41 @@ class TwoDimensionsScreen:
     def hide(self):
         if self.active:
             self.active = False
+            
+            # Primeiro esconde a viewport se existir
+            if hasattr(self, 'viewport_window') and self.viewport_window:
+                self.viewport_window.hide()
+                self.viewport_window = None
+            
+            # Remove o frame OpenGL primeiro
             if hasattr(self, 'ogl_frame'):
                 self.ogl_frame.destroy()
-                self.ogl_frame.pack_forget()
-            
-            for widget in self.frame.winfo_children():
-                widget.destroy()
-            
-            for widget in self.frame_right.winfo_children():
-                widget.destroy()
-            
-            if hasattr(self, 'ogl_frame'):
                 delattr(self, 'ogl_frame')
             
-            self.frame.pack_forget()
-            self.frame_right.pack_forget()
+            # Depois remove os widgets internos
+            if hasattr(self, 'inner_frame'):
+                self.inner_frame.destroy()
             
-            # Hide viewport window
-            self.viewport_window.hide()
+            if hasattr(self, 'canvas'):
+                self.canvas.destroy()
+            
+            if hasattr(self, 'scrollbar'):
+                self.scrollbar.destroy()
+            
+            if hasattr(self, 'controls_frame'):
+                self.controls_frame.destroy()
+            
+            if hasattr(self, 'right_container'):
+                self.right_container.destroy()
+            
+            # Por último, remove o container principal
+            if hasattr(self, 'main_container'):
+                self.main_container.pack_forget()
+                # self.main_container.destroy()
     
     def show(self):
         if not self.active:
             self.active = True
             self.create_widgets()
-            self.frame.pack(side=tk.LEFT, fill=tk.BOTH)
-            self.frame_right.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
+            self.main_container.pack(side=tk.LEFT, fill=tk.BOTH)
+            self.right_container.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)

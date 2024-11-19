@@ -309,7 +309,7 @@ class ViewportDisplay(AppOgl):
         # Desenha o objeto recortado
         if self.points:
             glBegin(GL_LINES)
-            glColor3f(1.0, 1.0, 0.0)  # Amarelo
+            glColor3f(0.0, 0.0, 0.0)  # Amarelo
             for i in range(0, len(self.points), 2):
                 if i + 1 < len(self.points):
                     glVertex2f(self.points[i][0], self.points[i][1])
