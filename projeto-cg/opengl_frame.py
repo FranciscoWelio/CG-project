@@ -590,6 +590,16 @@ class AppOgl(OpenGLFrame):
         #Desenha o novo quadrado rotacionado
         self.draw_square(*self.square_points_list)
 
+    def rotacaoReta(self, angle, angle2):
+        
+        self.square_points_list = Rotacao.realizar_rotacaoReta(self.square_points_list, angle, angle2)
+
+        #Remove o quadrado anterior
+        self.points = []
+
+        #Desenha o novo quadrado rotacionado
+        self.draw_square(*self.square_points_list)
+
     def rotacao3D(self, eixo: str, angle: int):
         self.cube_points_list = Rotacao3D.realizar_rotacao(eixo, self.cube_points_list, angle)
 

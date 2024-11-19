@@ -1,3 +1,4 @@
+import math
 from .utils import FloatEntry, IntEntry
 import tkinter as tk
 import customtkinter as ctk
@@ -93,9 +94,20 @@ class TwoDimensionsScreen:
         btn_ref45 = tk.Button(self.frame, text="Ref Reta 45", command=lambda: self.ogl_frame.reflexao45())
         btn_ref45.grid(row=8, column=2, padx=5, pady=7, sticky="nsew")
 
+
+        retaA = FloatEntry(self.frame, 0, placeholder_text="Ax", height=10, width=40)
+        retaA.grid(row=9, column=1, padx=5, pady=5, sticky="nsew")
+        retaB = FloatEntry(self.frame, 0, placeholder_text="B", height=10, width=40)
+        retaB.grid(row=9, column=2, padx=5, pady=5, sticky="nsew")
+        a = retaA.get_value()
+        thetaCosA = (1/math.sqrt((a**2)+1))
+        thetaSinA = (a/math.sqrt((a**2)+1))
+        btn_refReta = tk.Button(self.frame, text="Ref Reta y = ax + b", command=lambda: [self.ogl_frame.translacao(0, -retaB.get_value()), self.ogl_frame.rotacaoReta(thetaCosA,-thetaSinA),self.ogl_frame.reflexaoX(), self.ogl_frame.rotacaoReta(thetaCosA,thetaSinA), self.ogl_frame.translacao(0, retaB.get_value())])
+        btn_refReta.grid(row=9, column=0, padx=5, pady=7, sticky="nsew")
+
         # Botões para Aplicar Todos
         btn_AplicarAll = tk.Button(self.frame, text="Aplicar Transformações", command=lambda: [self.ogl_frame.translacao(-entry_pos_x.get_value(), -entry_pos_y.get_value()),self.ogl_frame.translacao(int(entry_tx.get()), int(entry_ty.get())), self.ogl_frame.escala(entry_sx.get_value(), entry_sy.get_value()), self.ogl_frame.rotacao(entry_rot.get_value()),self.ogl_frame.cisalhamento(entry_a.get_value(), entry_b.get_value()),self.ogl_frame.translacao(entry_pos_x.get_value(), entry_pos_y.get_value())])
-        btn_AplicarAll.grid(row=9, column=0, padx=5, pady=5, sticky="nsew")
+        btn_AplicarAll.grid(row=10, column=0, padx=5, pady=5, sticky="nsew")
 
     def hide(self):
         if self.active:
