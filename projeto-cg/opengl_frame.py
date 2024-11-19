@@ -7,7 +7,7 @@ from OpenGL.GLUT import *
 from OpenGL.GLU import *
 from pyopengltk import OpenGLFrame
 
-from Transformações import (
+from transformations import (
     Rotacao,
     Translacao,
     Escala,
@@ -41,33 +41,55 @@ class AppOgl(OpenGLFrame):
         self.current_pos = [-300, 0]
         self.threed = threed
         self.rotated = False
-        # self.initgl()
+        self.context_initialized = False
+        self._is_current = False
+
+    def make_current(self):
+        """Garante que este contexto OpenGL seja o atual"""
+        if not self._is_current:
+            if not hasattr(self, 'context'):
+                self.context = self.tk.call('winfo', 'id', self._w)
+            self.tk.call('winfo', 'id', self._w)
+            self._is_current = True
+
+    def release_current(self):
+        """Libera o contexto atual"""
+        self._is_current = False
 
     def initgl(self):
         """Inicializa o ambiente OpenGL"""
-        self._after_id = None
-        if not self.threed:
-            glClearColor(0.7, 0.7, 0.7, 0.0) #Cor de fundo do openGL
-            glMatrixMode(GL_PROJECTION)
-            glLoadIdentity()
-            gluOrtho2D(-self.winfo_reqwidth()/2, self.winfo_reqwidth()/2, -self.winfo_reqheight()/2, self.winfo_reqheight()/2)
-        else:
-            glClearColor(0.7, 0.7, 0.7, 0.0)
-            glMatrixMode(GL_PROJECTION)
-            glLoadIdentity()
-            glFrustum(-10.0, 10.0, -10.0, 10.0, 20, 3000.0)
-            #glMatrixMode(GL_MODELVIEW)
-            #glLoadIdentity()
-            glTranslatef(0.0, 0.0, -500.0)
-            glPointSize(1.0)
-        self.points = []  # Lista de pontos para armazenar o desenho
-        self.square_points_list = [] # Lista de pontos para armazenar os vértices do quadrado
+        self.make_current()
+        try:
+            self._after_id = None
+            if not self.threed:
+                glClearColor(0.7, 0.7, 0.7, 0.0)
+                glMatrixMode(GL_PROJECTION)
+                glLoadIdentity()
+                gluOrtho2D(-self.winfo_reqwidth()/2, self.winfo_reqwidth()/2, 
+                          -self.winfo_reqheight()/2, self.winfo_reqheight()/2)
+            else:
+                glClearColor(0.7, 0.7, 0.7, 0.0)
+                glMatrixMode(GL_PROJECTION)
+                glLoadIdentity()
+                glFrustum(-10.0, 10.0, -10.0, 10.0, 20, 3000.0)
+                glTranslatef(0.0, 0.0, -500.0)
+                glPointSize(1.0)
+            self.points = []
+            self.square_points_list = []
+            self.context_initialized = True
+        finally:
+            self.release_current()# Lista de pontos para armazenar os vértices do quadrado
 
     def redraw(self):
-        if self.threed:
-            self.draw_scene3D()
-        else:
-            self.draw_scene()
+        """Redesenha a cena OpenGL"""
+        self.make_current()
+        try:
+            if self.threed:
+                self.draw_scene3D()
+            else:
+                self.draw_scene()
+        finally:
+            self.release_current()
 
     def draw_scene(self, red = 1, green=0, blue=0):
         """Redesenha a cena OpenGL para que os objetos etc. fiquem na tela"""
@@ -734,15 +756,19 @@ class AppOgl(OpenGLFrame):
             self.frame.after(500, self.update_animation)
 
     def destroy(self):
-        self.animate = 0
-        if hasattr(self, '_after_id') and self._after_id:
-            try:
-                self.after_cancel(self._after_id)
-            except ValueError:
-                pass  # Ignore if the after_id is invalid
-        self.update_idletasks()
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        super().destroy()            
+        self.make_current()
+        try:
+            self.animate = 0
+            if hasattr(self, '_after_id') and self._after_id:
+                try:
+                    self.after_cancel(self._after_id)
+                except ValueError:
+                    pass
+            self.update_idletasks()
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+        finally:
+            self.release_current()
+            super().destroy()       
         
     
 

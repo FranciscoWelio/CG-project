@@ -6,6 +6,7 @@ from OpenGL.GL import *
 from OpenGL.GLUT import *
 from OpenGL.GLU import *
 from opengl_frame import AppOgl
+from viewport import ViewportWindow
 
 
 class TwoDimensionsScreen:
@@ -17,11 +18,21 @@ class TwoDimensionsScreen:
         self.frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=False)
         
         self.frame_right = tk.Frame(self.window, width=300, height=600)
-
+        
+        # Create viewport window after main window is created
+        self.window.update()
+        self.viewport_window = ViewportWindow(self.window)
+        
     def create_widgets(self):
         self.ogl_frame = AppOgl(self.frame_right, width=700, height=600)
-        self.ogl_frame.pack(fill=tk.BOTH, expand=False)  # Definindo expand=False para manter o tamanho fixo
+        self.ogl_frame.pack(fill=tk.BOTH, expand=False)
         self.ogl_frame.animate = 1
+        
+        # Add viewport toggle button
+        btn_toggle_viewport = tk.Button(self.frame, text="Toggle Viewport", 
+                                      command=self.toggle_viewport)
+        btn_toggle_viewport.grid(row=0, column=0, columnspan=4, padx=5, pady=5, sticky="nsew")
+        
         entry_tamanho = FloatEntry(self.frame, 100, placeholder_text="size", height=10, width=40)
         entry_tamanho.grid(row=2, column=1, padx=5, pady=5, sticky="nsew")
         entry_pos_x = FloatEntry(self.frame, 0, placeholder_text="x", height=10, width=40)
@@ -31,7 +42,23 @@ class TwoDimensionsScreen:
 
         lbl_tamanho = tk.Label(self.frame, background="#000C66")
         lbl_tamanho.grid(row=9, column=1, padx=5, pady=5, sticky="nsew")
-        btn_desenhar_quadrado = tk.Button(self.frame, text="Desenhar Quadrado", command=lambda: [self.ogl_frame.square_points(entry_tamanho.get_value()),self.ogl_frame.translacao(entry_pos_x.get_value(), entry_pos_y.get_value())])
+        
+        # Modify the square drawing to update viewport
+        def update_viewport():
+            if hasattr(self, 'viewport_window'):
+                self.viewport_window.update_viewport(self.ogl_frame.points)
+                # Make main context current again
+                if hasattr(self, 'ogl_frame'):
+                    self.ogl_frame.tk.call('winfo', 'id', self.ogl_frame._w)
+        
+        # Modified square drawing function
+        def draw_square():
+            self.ogl_frame.square_points(entry_tamanho.get_value())
+            self.ogl_frame.translacao(entry_pos_x.get_value(), entry_pos_y.get_value())
+            update_viewport()
+        
+        btn_desenhar_quadrado = tk.Button(self.frame, text="Desenhar Quadrado", 
+                                        command=draw_square)
         btn_desenhar_quadrado.grid(row=2, column=0, padx=5, pady=5, sticky="nsew")
 
         # Caixa de entrada para Fator de escala Sx
@@ -43,7 +70,7 @@ class TwoDimensionsScreen:
         entry_sy.grid(row=3, column=2, padx=6, pady=6, sticky="nsew")
 
         # Botão para Escala
-        btn_scale = tk.Button(self.frame, text="Aplicar Escala", command=lambda: self.ogl_frame.escala(entry_sx.get_value(), entry_sy.get_value()))
+        btn_scale = tk.Button(self.frame, text="Aplicar Escala", command=lambda: [self.ogl_frame.escala(entry_sx.get_value(), entry_sy.get_value()), self.viewport_window.update_viewport(self.ogl_frame.points)])
         btn_scale.grid(row=3, column=0, padx=5, pady=5, sticky="nsew")
 
         # Caixa de entrada para Translação Tx
@@ -55,7 +82,7 @@ class TwoDimensionsScreen:
         entry_ty.grid(row=4, column=2, padx=5, pady=15, sticky="nsew")
 
         # Botão para Translação
-        btn_translate = tk.Button(self.frame, text="Aplicar Translação", command=lambda: self.ogl_frame.translacao(int(entry_tx.get()), int(entry_ty.get())) if entry_tx.get() and entry_ty.get() else 0 )
+        btn_translate = tk.Button(self.frame, text="Aplicar Translação", command=lambda: [self.ogl_frame.translacao(int(entry_tx.get()), int(entry_ty.get())), self.viewport_window.update_viewport(self.ogl_frame.points)] if entry_tx.get() and entry_ty.get() else 0 )
         btn_translate.grid(row=4, column=0, padx=5, pady=5, sticky="nsew")
 
         # Caixa de entrada para Rotacao
@@ -66,7 +93,7 @@ class TwoDimensionsScreen:
         lbl_rot.grid(row=5, column=0, padx=5, pady=5, sticky="nsew")
 
         # Botão para Rotação
-        btn_rotate = tk.Button(self.frame, text="Aplicar Rotação", command=lambda: self.ogl_frame.rotacao(entry_rot.get_value()) )
+        btn_rotate = tk.Button(self.frame, text="Aplicar Rotação", command=lambda: [self.ogl_frame.rotacao(entry_rot.get_value()), self.viewport_window.update_viewport(self.ogl_frame.points)] )
         btn_rotate.grid(row=5, column=0, padx=5, pady=5, sticky="nsew")
 
         # Caixa de entrada para Fator A de cisalhamento
@@ -78,7 +105,7 @@ class TwoDimensionsScreen:
         entry_b.grid(row=6, column=2, padx=5, pady=5, sticky="nsew")
 
         # Botão para Cisalhamento
-        btn_shear = tk.Button(self.frame, text="Aplicar Cisalhamento", command=lambda: self.ogl_frame.cisalhamento(entry_a.get_value(), entry_b.get_value()))
+        btn_shear = tk.Button(self.frame, text="Aplicar Cisalhamento", command=lambda: [self.ogl_frame.cisalhamento(entry_a.get_value(), entry_b.get_value()), self.viewport_window.update_viewport(self.ogl_frame.points)])
         btn_shear.grid(row=6, column=0, padx=5, pady=5, sticky="nsew")
 
         # Botões para Reflexão
@@ -109,6 +136,13 @@ class TwoDimensionsScreen:
         btn_AplicarAll = tk.Button(self.frame, text="Aplicar Transformações", command=lambda: [self.ogl_frame.translacao(-entry_pos_x.get_value(), -entry_pos_y.get_value()),self.ogl_frame.translacao(int(entry_tx.get()), int(entry_ty.get())), self.ogl_frame.escala(entry_sx.get_value(), entry_sy.get_value()), self.ogl_frame.rotacao(entry_rot.get_value()),self.ogl_frame.cisalhamento(entry_a.get_value(), entry_b.get_value()),self.ogl_frame.translacao(entry_pos_x.get_value(), entry_pos_y.get_value())])
         btn_AplicarAll.grid(row=10, column=0, padx=5, pady=5, sticky="nsew")
 
+    def toggle_viewport(self):
+        """Toggle viewport window visibility"""
+        if self.viewport_window.window.state() == 'withdrawn':
+            self.viewport_window.show()
+        else:
+            self.viewport_window.hide()
+
     def hide(self):
         if self.active:
             self.active = False
@@ -127,6 +161,9 @@ class TwoDimensionsScreen:
             
             self.frame.pack_forget()
             self.frame_right.pack_forget()
+            
+            # Hide viewport window
+            self.viewport_window.hide()
     
     def show(self):
         if not self.active:
