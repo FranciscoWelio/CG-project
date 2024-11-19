@@ -90,7 +90,7 @@ class TwoDimensionsScreen:
             self.ogl_frame.translacao(entry_pos_x.get_value(), entry_pos_y.get_value())
             self.viewport_window.update_viewport(self.ogl_frame.points)
         
-        ttk.Button(quadrado_frame, text="Desenhar Quadrado", 
+        ttk.Button(quadrado_frame, text="Desenhar Quadrado",
                   command=draw_square).pack(fill='x', pady=2)
 
         # === Seção Escala ===
@@ -160,9 +160,13 @@ class TwoDimensionsScreen:
         buttons_frame2.pack(fill='x', pady=2)
         
         ttk.Button(buttons_frame2, text="Reflexão na Origem",
-                  command=lambda: self.ogl_frame.reflexaoOrigem()).pack(side='left', padx=2)
+                  command=lambda: [self.ogl_frame.reflexaoOrigem(), 
+                                    self.viewport_window.update_viewport(self.ogl_frame.points)]
+        ).pack(side='left', padx=2)
         ttk.Button(buttons_frame2, text="Reflexão 45°",
-                  command=lambda: self.ogl_frame.reflexao45()).pack(side='left', padx=2)
+                  command=lambda: [self.ogl_frame.reflexao45(),
+                  self.viewport_window.update_viewport(self.ogl_frame.points)]
+        ).pack(side='left', padx=2)
 
         # === Seção Reflexão em Reta ===
         reta_frame = ttk.LabelFrame(self.inner_frame, text="Reflexão em Reta", padding=5)
@@ -183,7 +187,9 @@ class TwoDimensionsScreen:
             self.ogl_frame.translacao(0, b)
             
         ttk.Button(reta_frame, text="Reflexão y = ax + b",
-                  command=reflexao_reta).pack(fill='x', pady=2)
+                  command=lambda: [reflexao_reta(),
+                           self.viewport_window.update_viewport(self.ogl_frame.points)]
+        ).pack(fill='x', pady=2)
 
         # === Seção Aplicar Todas ===
         todas_frame = ttk.LabelFrame(self.inner_frame, text="Aplicar Todas", padding=5)
@@ -198,7 +204,9 @@ class TwoDimensionsScreen:
             self.ogl_frame.translacao(entry_pos_x.get_value(), entry_pos_y.get_value())
             
         ttk.Button(todas_frame, text="Aplicar Todas Transformações",
-                  command=aplicar_todas).pack(fill='x', pady=2)
+                  command=lambda: [aplicar_todas(),
+                                  self.viewport_window.update_viewport(self.ogl_frame.points)]
+        ).pack(fill='x', pady=2)
 
     def toggle_viewport(self):
         if self.viewport_window.window.state() == 'withdrawn':
