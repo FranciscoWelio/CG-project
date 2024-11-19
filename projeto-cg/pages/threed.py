@@ -173,6 +173,12 @@ class ThreeDimensionsScreen:
             if hasattr(self, 'ogl_frame'):
                 self.ogl_frame.destroy()
             
+            for widget in self.frame.winfo_children():
+                widget.destroy()
+            
+            for widget in self.frame_right.winfo_children():
+                widget.destroy()
+
             self.main_frame.pack_forget()
             self.frame_right.pack_forget()
             
