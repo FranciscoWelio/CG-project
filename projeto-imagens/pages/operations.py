@@ -33,7 +33,7 @@ class ImageOperationsProcessor:
         
         # Operation selection
         self.operation_var = tk.StringVar(value="soma")
-        operations = ["soma", "subtração", "multiplicação", "divisão"]
+        operations = ["soma", "subtração", "multiplicação", "divisão", "and", "or", "xor"]
         self.operation_combo = ttk.Combobox(controls, textvariable=self.operation_var, values=operations)
         self.operation_combo.pack(side=tk.LEFT, padx=5)
         
@@ -133,20 +133,53 @@ class ImageOperationsProcessor:
             self.image1 = cv2.resize(self.image1, (min_w, min_h))
             self.image2 = cv2.resize(self.image2, (min_w, min_h))
 
+        img_height, img_width = self.image1.shape
         operation = self.operation_var.get()
         img1 = self.image1.astype(float)
         img2 = self.image2.astype(float)
 
         if operation == "soma":
-            result = img1 + img2
+            result = np.zeros_like(img1)
+            for y in range(img_height):
+                for x in range(img_width):
+                    result[y,x] = img1[y,x] + img2[y,x]
         elif operation == "subtração":
-            result = img1 - img2
+            result = np.zeros_like(img1)
+            for y in range(img_height):
+                for x in range(img_width):
+                    result[y,x] = img1[y,x] - img2[y,x]
         elif operation == "multiplicação":
-            result = (img1 * img2) / 255.0
-        else:  # divisão
-            # Avoid division by zero
+            result = np.zeros_like(img1)
+            for y in range(img_height):
+                for x in range(img_width):
+                    result[y,x] = img1[y,x] * img2[y,x]
+        elif operation == "divisão":
             img2[img2 == 0] = 1
-            result = (img1 / img2) * 255.0
+            result = np.zeros_like(img1)
+            for y in range(img_height):
+                for x in range(img_width):
+                    result[y,x] = img1[y,x] / img2[y,x]
+        elif operation == "and":
+            img1 = np.array(img1, dtype=np.uint8)
+            img2 = np.array(img2, dtype=np.uint8)
+            result = np.zeros_like(img1)
+            for y in range(img_height):
+                for x in range(img_width):
+                    result[y,x] = img1[y,x] & img2[y,x]
+        elif operation == "or":
+            img1 = np.array(img1, dtype=np.uint8)
+            img2 = np.array(img2, dtype=np.uint8)
+            result = np.zeros_like(img1)
+            for y in range(img_height):
+                for x in range(img_width):
+                    result[y,x] = img1[y,x] | img2[y,x]
+        elif operation == "xor":
+            img1 = np.array(img1, dtype=np.uint8)
+            img2 = np.array(img2, dtype=np.uint8)
+            result = np.zeros_like(img1)
+            for y in range(img_height):
+                for x in range(img_width):
+                    result[y,x] = img1[y,x] ^ img2[y,x]
 
         self.result_image = np.clip(result, 0, 255).astype(np.uint8)
         self.update_display()

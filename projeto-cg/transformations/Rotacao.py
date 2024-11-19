@@ -25,7 +25,23 @@ def rotate_point(point, ang, w):
     
     return rotated_point
 
+def rotate_pointReta(point, ang1, ang2, w):
 
+    matrizTheta = np.array([[ang1, - ang2, 0],
+                            [ang2, ang1, 0],
+                            [0, 0, 1]])
+    
+    # Convertendo o ponto para um vetor coluna
+    point_vector = np.array([[point[0]], [point[1]], [w]])  # w = 1 para pontos
+
+    # Aplicando a transformação de rotação multiplicando a matriz de translação pelo vetor do ponto
+    rotated_point_vector = np.dot(matrizTheta, point_vector)
+
+    # Normalizando as coordenadas homogêneas resultantes
+    rotated_point = (rotated_point_vector[0][0] / rotated_point_vector[2][0], 
+                        rotated_point_vector[1][0] / rotated_point_vector[2][0])
+    
+    return rotated_point
 def realizar_rotacao(square_points_list, angle):
 
     point1, point2, point3, point4 = square_points_list
@@ -35,6 +51,19 @@ def realizar_rotacao(square_points_list, angle):
     point2 = rotate_point(point2, angle, 1)
     point3 = rotate_point(point3, angle, 1)
     point4 = rotate_point(point4, angle, 1)
+
+    # retornar os vertices do quadrado após a rotação
+    return [point1, point2, point3, point4]
+
+def realizar_rotacaoReta(square_points_list, angle, angle2):
+
+    point1, point2, point3, point4 = square_points_list
+
+    # Rotacionar os pontos
+    point1 = rotate_pointReta(point1, angle, angle2, 1)
+    point2 = rotate_pointReta(point2, angle, angle2, 1)
+    point3 = rotate_pointReta(point3, angle, angle2, 1)
+    point4 = rotate_pointReta(point4, angle, angle2, 1)
 
     # retornar os vertices do quadrado após a rotação
     return [point1, point2, point3, point4]

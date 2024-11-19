@@ -1,0 +1,5 @@
+customtkinter==5.2.2
+opencv-python==4.10.0.84
+pygame==2.6.0
+pyglut==1.0.0
+pyopengltk==0.0.4
