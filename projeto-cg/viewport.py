@@ -328,15 +328,15 @@ class ViewportDisplay(AppOgl):
         self.world_top = top
         
         # Atualiza o tamanho da janela
-        self.configure(width=self.viewport_width, height=self.viewport_height)
+        # self.configure(width=self.viewport_width, height=self.viewport_height)
         
-        if hasattr(self, 'initialised') and self.initialised:
+        #if hasattr(self, 'initialised') and self.initialised:
             # Reconfigura a viewport com as novas dimensões
-            self.setup_viewport()
+            #self.setup_viewport()
             
             # Redesenha o objeto se existir
-            if self.current_points:
-                self.draw_world_object(self.current_points)
+        if self.current_points:
+            self.draw_world_object(self.current_points)
 
     def transform_points(self, world_points):
         """Transforma pontos do mundo para coordenadas da viewport"""
