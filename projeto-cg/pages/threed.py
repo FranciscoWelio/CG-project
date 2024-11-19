@@ -141,12 +141,8 @@ class ThreeDimensionsScreen:
         buttons_frame = ttk.Frame(reflexao_frame)
         buttons_frame.pack(fill='x', pady=2)
         
-        ttk.Button(buttons_frame, text="Aplicar Reflexão",
+        ttk.Button(buttons_frame, text="                                        Aplicar Reflexão                                       ",
                   command=lambda: self.ogl_frame.reflexao3D(selected_option_refl.get())).pack(side='left', padx=2)
-        ttk.Button(buttons_frame, text="Reflexão na Origem",
-                  command=self.ogl_frame.reflexaoOrigem).pack(side='left', padx=2)
-        ttk.Button(buttons_frame, text="Reflexão 45°",
-                  command=self.ogl_frame.reflexao45).pack(side='left', padx=2)
         
         # === Seção Aplicaro Todos ===
         Composicao_frame = ttk.LabelFrame(self.frame, text="Aplicar Transformações", padding=5)
@@ -164,7 +160,7 @@ class ThreeDimensionsScreen:
                                     self.ogl_frame.rotacao3D(selected_option.get(),int(angle_entry.get())),
                                     self.ogl_frame.cisalhamento3D(int(entry_a.get()), -int(entry_b.get()),int(entry_c.get())),
                                     self.ogl_frame.reflexao3D(selected_option_refl.get()),
-                                    self.ogl_frame.translacao3D(int(entry_tx.get()), int(entry_ty.get()), int(entry_tz.get()))]).pack(side='left', padx=2)
+                                    self.ogl_frame.translacao3D(int(entry_tx.get()), int(entry_ty.get()), int(entry_tz.get()))]).pack(fill='x', padx=2)
 
 
     def hide(self):
